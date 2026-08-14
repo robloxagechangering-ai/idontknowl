@@ -677,12 +677,19 @@ def get_role_selection_kb(user_id: int):
 
 def get_payment_method_kb(user_id: int):
     kb = InlineKeyboardBuilder()
-    kb.add(mkbtn(get_text("payment_method_ton",    user_id), "diamond", callback_data="payment_method_ton"))
-    kb.add(mkbtn(get_text("payment_method_card",   user_id), "card",    callback_data="payment_method_card"))
-    kb.add(mkbtn(get_text("payment_method_stars",  user_id), "star",    callback_data="payment_method_stars"))
-    kb.add(mkbtn(get_text("payment_method_crypto", user_id), "coin",    callback_data="payment_method_crypto"))
-    kb.add(mkbtn(get_text("back_button",           user_id), "back",     callback_data="back_to_role"))
-    kb.add(mkbtn(get_text("back_to_menu",          user_id), "inbox",    callback_data="back_to_menu"))
+
+    def _label(key: str, fallback: str) -> str:
+        value = get_text(key, user_id)
+        if not isinstance(value, str) or not value.strip():
+            return fallback
+        return value.strip()
+
+    kb.add(mkbtn(_label("payment_method_ton", "TON"), "diamond", callback_data="payment_method_ton"))
+    kb.add(mkbtn(_label("payment_method_card", "Карта"), "card", callback_data="payment_method_card"))
+    kb.add(mkbtn(_label("payment_method_stars", "Stars"), "star", callback_data="payment_method_stars"))
+    kb.add(mkbtn(_label("payment_method_crypto", "Крипта"), "coin", callback_data="payment_method_crypto"))
+    kb.add(mkbtn(_label("back_button", "Назад"), "back", callback_data="back_to_role"))
+    kb.add(mkbtn(_label("back_to_menu", "Назад в меню"), "inbox", callback_data="back_to_menu"))
     kb.adjust(2, 2, 1, 1)
     return kb.as_markup()
 
@@ -1817,31 +1824,51 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
 # ─── Выбор роли при создании сделки ───────────────────────────────────────────
 @dp.callback_query(lambda c: c.data in ("role_seller", "role_buyer"))
 async def process_role_selection(callback_query: types.CallbackQuery, state: FSMContext):
+    # Acknowledge immediately so Telegram does not keep the button spinning.
     await callback_query.answer()
+
     user_id = callback_query.from_user.id
     role = "seller" if callback_query.data == "role_seller" else "buyer"
     await state.update_data(creator_role=role)
     await state.set_state(CreateDealStates.choose_payment_method)
-    text = get_text("choose_payment_method" if role == "seller" else "choose_payment_method_buyer", user_id)
+
+    text = get_text(
+        "choose_payment_method" if role == "seller" else "choose_payment_method_buyer",
+        user_id,
+    )
+    message = callback_query.message
+    markup = get_payment_method_kb(user_id)
+
+    # Role screen can be a photo, a caption message, or a normal text message.
     try:
-        await callback_query.message.edit_caption(
-            caption=text,
-            reply_markup=get_payment_method_kb(user_id),
+        if getattr(message, "caption", None) is not None:
+            await message.edit_caption(
+                caption=text,
+                reply_markup=markup,
+                parse_mode="HTML",
+            )
+        elif getattr(message, "text", None) is not None:
+            await message.edit_text(
+                text=text,
+                reply_markup=markup,
+                parse_mode="HTML",
+            )
+        else:
+            await message.answer(
+                text=text,
+                reply_markup=markup,
+                parse_mode="HTML",
+            )
+    except Exception as exc:
+        # Do not try edit_text/edit_caption again on an incompatible message.
+        logging.getLogger(__name__).warning(
+            "Could not edit role-selection message; sending a new one: %s", exc
+        )
+        await message.answer(
+            text=text,
+            reply_markup=markup,
             parse_mode="HTML",
         )
-    except Exception:
-        try:
-            await callback_query.message.edit_text(
-                text=text,
-                reply_markup=get_payment_method_kb(user_id),
-                parse_mode="HTML",
-            )
-        except Exception:
-            await callback_query.message.answer(
-                text=text,
-                reply_markup=get_payment_method_kb(user_id),
-                parse_mode="HTML",
-            )
 
 
 # ─── Методы оплаты ────────────────────────────────────────────────────────────
