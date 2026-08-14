@@ -1881,3 +1881,115 @@ def get_html_text(key: str, lang: str, **kwargs) -> str:
     except (KeyError, IndexError) as exc:
         print(f"[locales] Missing format key '{exc}' for text key '{key}'")
         return text
+
+# ============================================================
+# FINAL SIX-LANGUAGE USER UI
+# Selected language is authoritative for the main user flow.
+# ============================================================
+_CORE = {
+"uk": {
+"menu_credentials":"💳 Мої реквізити","menu_create_deal":"🤝 Створити угоду","menu_balance":"💰 Баланс","menu_my_deals":"📂 Мої угоди","menu_referral":"🔗 Реферали","lang_button":"🌐 Мова",
+"back_to_menu":"Назад у меню","back_button":"Назад","choose_language":"🌐 Виберіть мову","choose_role":"🎯 Виберіть роль","role_seller_button":"Продавець","role_buyer_button":"Покупець",
+"choose_payment_method":"1⃣ Оберіть спосіб оплати:","choose_payment_method_buyer":"1⃣ Оберіть спосіб оплати:","payment_method_card":"Картка","payment_method_stars":"Stars","payment_method_crypto":"Криптовалюта",
+"payment_method_ton":"TON","crypto_ton":"TON","crypto_usdt":"USDT","crypto_btc":"BTC","currency_RUB":"RUB","currency_UAH":"UAH","currency_KZT":"KZT","currency_BYN":"BYN",
+"enter_ton_amount":"💎 Введіть суму в TON:","enter_card_currency":"🏦 Оберіть валюту картки:","enter_amount":"💰 Введіть суму в {currency}:","enter_stars_amount":"⭐️ Введіть кількість Stars:",
+"choose_crypto":"🪙 Оберіть криптовалюту:","enter_crypto_amount_ton":"💎 Введіть суму в TON:","enter_crypto_amount_usdt":"🪙 Введіть суму в USDT:","enter_crypto_amount_btc":"🔎 Введіть суму в BTC:",
+"enter_description":"✍️ Опишіть предмет угоди:\n\nПриклад: t.me/nft/DurovsCap-1","deal_not_found":"❌ Угоду не знайдено.","already_connected":"⛔️ Інший учасник уже підключився до цієї угоди.",
+"back_to_deal":"← Назад до угоди","cancel_deal_button":"Скасувати","confirm_receipt_button":"Підтвердити","item_delivered_button":"✅ Передано",
+"send_item_button":"Передати менеджеру","change_currency":"Змінити валюту","copy_ref_link_button":"Скопіювати реферальне посилання","support_button":"Підтримка",
+"my_deals_title":"📂 Мої угоди","my_deals_back_button":"◀️ Назад до угод","my_deals_cancel_search":"❌ Скасувати","my_deals_search_button":"📂 Мої угоди",
+"my_deals_search_prompt":"🔎 Введіть код угоди для пошуку:","my_deals_search_result":"🔎 Пошук: {search} — знайдено: {count}","balance_title":"💰 Ваш баланс:","balance_empty":"💔 Ваш баланс порожній","completed_deals_count":"📈 Завершених угод: {count}",
+"withdraw_button":"Вивести кошти","transactions_button":"Транзакції","transactions_back_button":"← Назад до балансу","transactions_title":"📊 Історія транзакцій","transactions_empty":"💤 У вас ще немає транзакцій",
+"cancel_confirm_yes":"Так, скасувати","cancel_confirm_no":"Ні, залишити","cancel_confirm_text":"⚠️ <b>Ви впевнені, що хочете скасувати угоду <code>#{deal_id}</code>?</b>\n\n<i>Цю дію неможливо скасувати.</i>",
+"active_deal_not_found":"❌ Активну угоду не знайдено.","only_creator_can_cancel":"❌ Скасувати угоду може лише її творець.",
+"wallet_updated":"✅ TON-гаманець збережено.","card_updated":"✅ Дані картки збережено.","stars_username_updated":"✅ Username Stars збережено.","usdt_wallet_updated":"✅ USDT-гаманець збережено.","btc_wallet_updated":"✅ BTC-адресу збережено.",
+"new_wallet":"💎 Введіть новий TON-гаманець:","new_card":"💳 Введіть номер картки:","new_stars_username":"⭐️ Введіть username Stars (без @):","new_usdt_wallet":"🪙 Введіть адресу USDT (TRC20):","new_btc_wallet":"🔎 Введіть BTC-адресу:",
+"my_credentials":"📌 <b>Мої реквізити</b>","edit_ton":"TON-гаманець","edit_card":"Картка","edit_stars":"@username (Stars)","edit_usdt":"USDT-гаманець","edit_btc":"BTC-адреса",
+"req_saved":"✅ Реквізит збережено.","req_prompt":"✏️ Введіть {currency} для {currency_name}\n\n📝 Приклад:\n{example}","my_deals_empty":"📭 У вас поки немає угод.",
+"choose_language":"🌐 Виберіть мову","lang_changed":"✅ Мову змінено.","language_russian":"Російська","language_english":"Англійська","language_ukrainian":"Українська","language_kazakh":"Казахська","language_chinese":"Китайська","language_hindi":"Гінді",
+"welcome":"Ласкаво просимо до Lolz Steam Market\n\nВаш надійний P2P-гарант:\nАвтоматичні угоди з NFT та подарунками\nПовний захист обох сторін\nРеферальна програма — 50% від комісії\nПередача товарів через менеджера: @LolzSteamMarket\n\nВиберіть дію нижче",
+},
+"kk": {
+"menu_credentials":"💳 Менің реквизиттерім","menu_create_deal":"🤝 Мәміле жасау","menu_balance":"💰 Баланс","menu_my_deals":"📂 Менің мәмілелерім","menu_referral":"🔗 Рефералдар","lang_button":"🌐 Тіл",
+"back_to_menu":"Мәзірге оралу","back_button":"Артқа","choose_language":"🌐 Тілді таңдаңыз","choose_role":"🎯 Рөлді таңдаңыз","role_seller_button":"Сатушы","role_buyer_button":"Сатып алушы",
+"choose_payment_method":"1⃣ Төлем әдісін таңдаңыз:","choose_payment_method_buyer":"1⃣ Төлем әдісін таңдаңыз:","payment_method_card":"Карта","payment_method_stars":"Stars","payment_method_crypto":"Криптовалюта",
+"payment_method_ton":"TON","crypto_ton":"TON","crypto_usdt":"USDT","crypto_btc":"BTC","currency_RUB":"RUB","currency_UAH":"UAH","currency_KZT":"KZT","currency_BYN":"BYN",
+"enter_ton_amount":"💎 TON сомасын енгізіңіз:","enter_card_currency":"🏦 Карта валютасын таңдаңыз:","enter_amount":"💰 {currency} сомасын енгізіңіз:","enter_stars_amount":"⭐️ Stars санын енгізіңіз:",
+"choose_crypto":"🪙 Криптовалютаны таңдаңыз:","enter_crypto_amount_ton":"💎 TON сомасын енгізіңіз:","enter_crypto_amount_usdt":"🪙 USDT сомасын енгізіңіз:","enter_crypto_amount_btc":"🔎 BTC сомасын енгізіңіз:",
+"enter_description":"✍️ Мәміле затын сипаттаңыз:\n\nМысал: t.me/nft/DurovsCap-1","deal_not_found":"❌ Мәміле табылмады.","already_connected":"⛔️ Бұл мәмілеге басқа қатысушы қосылып қойған.",
+"cancel_deal_button":"Болдырмау","confirm_receipt_button":"Растау","item_delivered_button":"✅ Берілді","send_item_button":"Менеджерге беру","change_currency":"Валютаны өзгерту","copy_ref_link_button":"Реферал сілтемесін көшіру","support_button":"Қолдау",
+"my_deals_title":"📂 Менің мәмілелерім","my_deals_back_button":"◀️ Мәмілелерге оралу","my_deals_cancel_search":"❌ Болдырмау","my_deals_search_button":"📂 Мәмілелерім",
+"my_deals_search_prompt":"🔎 Іздеу үшін мәміле кодын енгізіңіз:","my_deals_search_result":"🔎 Іздеу: {search} — табылды: {count}","balance_title":"💰 Сіздің балансыңыз:","balance_empty":"💔 Балансыңыз бос","completed_deals_count":"📈 Аяқталған мәмілелер: {count}",
+"withdraw_button":"Қаражат шығару","transactions_button":"Транзакциялар","transactions_back_button":"← Балансқа оралу","transactions_title":"📊 Транзакциялар тарихы","transactions_empty":"💤 Әзірге транзакциялар жоқ",
+"cancel_confirm_yes":"Иә, болдырмау","cancel_confirm_no":"Жоқ, қалдыру","cancel_confirm_text":"⚠️ <b>#{deal_id} мәмілесін болдырмауға сенімдісіз бе?</b>\n\n<i>Бұл әрекетті қайтару мүмкін емес.</i>",
+"active_deal_not_found":"❌ Белсенді мәміле табылмады.","only_creator_can_cancel":"❌ Мәмілені тек оны жасаған адам болдырмай алады.",
+"wallet_updated":"✅ TON әмияны сақталды.","card_updated":"✅ Карта деректері сақталды.","stars_username_updated":"✅ Stars username сақталды.","usdt_wallet_updated":"✅ USDT әмияны сақталды.","btc_wallet_updated":"✅ BTC мекенжайы сақталды.",
+"new_wallet":"💎 Жаңа TON әмиянын енгізіңіз:","new_card":"💳 Карта нөмірін енгізіңіз:","new_stars_username":"⭐️ Stars username енгізіңіз (@ белгісінсіз):","new_usdt_wallet":"🪙 USDT (TRC20) мекенжайын енгізіңіз:","new_btc_wallet":"🔎 BTC мекенжайын енгізіңіз:",
+"my_credentials":"📌 <b>Менің реквизиттерім</b>","edit_ton":"TON әмияны","edit_card":"Карта","edit_stars":"@username (Stars)","edit_usdt":"USDT әмияны","edit_btc":"BTC мекенжайы",
+"req_saved":"✅ Реквизит сақталды.","req_prompt":"✏️ {currency} үшін {currency_name} енгізіңіз\n\n📝 Мысал:\n{example}","my_deals_empty":"📭 Сізде әзірге мәмілелер жоқ.",
+"lang_changed":"✅ Тіл өзгертілді.","language_russian":"Орысша","language_english":"Ағылшынша","language_ukrainian":"Украинша","language_kazakh":"Қазақша","language_chinese":"Қытайша","language_hindi":"Хинди",
+"welcome":"Lolz Steam Market-ке қош келдіңіз\n\nСіздің сенімді P2P-кепілгеріңіз:\nNFT және сыйлықтармен автоматты мәмілелер\nЕкі тараптың толық қорғалуы\nРефералдық бағдарлама — комиссияның 50%-ы\nТауарды менеджер арқылы беру: @LolzSteamMarket\n\nТөменнен әрекетті таңдаңыз",
+},
+"zh": {
+"menu_credentials":"💳 我的收款信息","menu_create_deal":"🤝 创建交易","menu_balance":"💰 余额","menu_my_deals":"📂 我的交易","menu_referral":"🔗 推荐","lang_button":"🌐 语言",
+"back_to_menu":"返回菜单","back_button":"返回","choose_language":"🌐 请选择语言","choose_role":"🎯 请选择角色","role_seller_button":"卖家","role_buyer_button":"买家",
+"choose_payment_method":"1⃣ 请选择付款方式：","choose_payment_method_buyer":"1⃣ 请选择付款方式：","payment_method_card":"银行卡","payment_method_stars":"Stars","payment_method_crypto":"加密货币",
+"payment_method_ton":"TON","crypto_ton":"TON","crypto_usdt":"USDT","crypto_btc":"BTC","currency_RUB":"RUB","currency_UAH":"UAH","currency_KZT":"KZT","currency_BYN":"BYN",
+"enter_ton_amount":"💎 请输入 TON 金额：","enter_card_currency":"🏦 请选择银行卡币种：","enter_amount":"💰 请输入 {currency} 金额：","enter_stars_amount":"⭐️ 请输入 Stars 数量：",
+"choose_crypto":"🪙 请选择加密货币：","enter_crypto_amount_ton":"💎 请输入 TON 金额：","enter_crypto_amount_usdt":"🪙 请输入 USDT 金额：","enter_crypto_amount_btc":"🔎 请输入 BTC 金额：",
+"enter_description":"✍️ 请描述交易商品：\n\n示例：t.me/nft/DurovsCap-1","deal_not_found":"❌ 未找到交易。","already_connected":"⛔️ 该交易已有其他参与者加入。",
+"cancel_deal_button":"取消交易","confirm_receipt_button":"确认","item_delivered_button":"✅ 已交付","send_item_button":"交给管理员","change_currency":"更换币种","copy_ref_link_button":"复制推荐链接","support_button":"客服",
+"my_deals_title":"📂 我的交易","my_deals_back_button":"◀️ 返回交易列表","my_deals_cancel_search":"❌ 取消","my_deals_search_button":"📂 我的交易",
+"my_deals_search_prompt":"🔎 输入交易代码进行搜索：","my_deals_search_result":"🔎 搜索：{search} — 找到：{count}","balance_title":"💰 您的余额：","balance_empty":"💔 您的余额为空","completed_deals_count":"📈 已完成交易：{count}",
+"withdraw_button":"提现","transactions_button":"交易记录","transactions_back_button":"← 返回余额","transactions_title":"📊 交易记录","transactions_empty":"💤 暂无交易记录",
+"cancel_confirm_yes":"是，取消","cancel_confirm_no":"否，保留","cancel_confirm_text":"⚠️ <b>确定要取消交易 <code>#{deal_id}</code> 吗？</b>\n\n<i>此操作无法撤销。</i>",
+"active_deal_not_found":"❌ 未找到进行中的交易。","only_creator_can_cancel":"❌ 只有交易创建者可以取消交易。",
+"wallet_updated":"✅ TON 钱包已保存。","card_updated":"✅ 银行卡信息已保存。","stars_username_updated":"✅ Stars 用户名已保存。","usdt_wallet_updated":"✅ USDT 钱包已保存。","btc_wallet_updated":"✅ BTC 地址已保存。",
+"new_wallet":"💎 请输入新的 TON 钱包：","new_card":"💳 请输入银行卡号：","new_stars_username":"⭐️ 请输入 Stars 用户名（不含 @）：","new_usdt_wallet":"🪙 请输入 USDT（TRC20）地址：","new_btc_wallet":"🔎 请输入 BTC 地址：",
+"my_credentials":"📌 <b>我的收款信息</b>","edit_ton":"TON 钱包","edit_card":"银行卡","edit_stars":"@username（Stars）","edit_usdt":"USDT 钱包","edit_btc":"BTC 地址",
+"req_saved":"✅ 收款信息已保存。","req_prompt":"✏️ 请输入 {currency} 的{currency_name}\n\n📝 示例：\n{example}","my_deals_empty":"📭 您目前没有交易。",
+"lang_changed":"✅ 语言已更改。","language_russian":"俄语","language_english":"英语","language_ukrainian":"乌克兰语","language_kazakh":"哈萨克语","language_chinese":"中文","language_hindi":"印地语",
+"welcome":"欢迎来到 Lolz Steam Market\n\n您可靠的 P2P 担保服务：\nNFT 和礼物自动交易\n全面保护交易双方\n推荐计划 — 获得 50% 的服务佣金\n通过管理员转移商品：@LolzSteamMarket\n\n请选择操作",
+},
+"hi": {
+"menu_credentials":"💳 मेरी भुगतान जानकारी","menu_create_deal":"🤝 डील बनाएं","menu_balance":"💰 बैलेंस","menu_my_deals":"📂 मेरी डील","menu_referral":"🔗 रेफरल","lang_button":"🌐 भाषा",
+"back_to_menu":"मेनू पर वापस जाएँ","back_button":"वापस","choose_language":"🌐 भाषा चुनें","choose_role":"🎯 भूमिका चुनें","role_seller_button":"विक्रेता","role_buyer_button":"खरीदार",
+"choose_payment_method":"1⃣ भुगतान का तरीका चुनें:","choose_payment_method_buyer":"1⃣ भुगतान का तरीका चुनें:","payment_method_card":"कार्ड","payment_method_stars":"Stars","payment_method_crypto":"क्रिप्टोकरेंसी",
+"payment_method_ton":"TON","crypto_ton":"TON","crypto_usdt":"USDT","crypto_btc":"BTC","currency_RUB":"RUB","currency_UAH":"UAH","currency_KZT":"KZT","currency_BYN":"BYN",
+"enter_ton_amount":"💎 TON राशि दर्ज करें:","enter_card_currency":"🏦 कार्ड की मुद्रा चुनें:","enter_amount":"💰 {currency} में राशि दर्ज करें:","enter_stars_amount":"⭐️ Stars की संख्या दर्ज करें:",
+"choose_crypto":"🪙 क्रिप्टोकरेंसी चुनें:","enter_crypto_amount_ton":"💎 TON में राशि दर्ज करें:","enter_crypto_amount_usdt":"🪙 USDT में राशि दर्ज करें:","enter_crypto_amount_btc":"🔎 BTC में राशि दर्ज करें:",
+"enter_description":"✍️ डील की वस्तु का विवरण दें:\n\nउदाहरण: t.me/nft/DurovsCap-1","deal_not_found":"❌ डील नहीं मिली।","already_connected":"⛔️ इस डील में दूसरा प्रतिभागी पहले ही जुड़ चुका है।",
+"cancel_deal_button":"रद्द करें","confirm_receipt_button":"पुष्टि करें","item_delivered_button":"✅ सौंप दिया गया","send_item_button":"मैनेजर को सौंपें","change_currency":"मुद्रा बदलें","copy_ref_link_button":"रेफरल लिंक कॉपी करें","support_button":"सहायता",
+"my_deals_title":"📂 मेरी डील","my_deals_back_button":"◀️ डील पर वापस","my_deals_cancel_search":"❌ रद्द करें","my_deals_search_button":"📂 मेरी डील",
+"my_deals_search_prompt":"🔎 खोजने के लिए डील कोड दर्ज करें:","my_deals_search_result":"🔎 खोज: {search} — मिलीं: {count}","balance_title":"💰 आपका बैलेंस:","balance_empty":"💔 आपका बैलेंस खाली है","completed_deals_count":"📈 पूरी हुई डील: {count}",
+"withdraw_button":"राशि निकालें","transactions_button":"लेन-देन","transactions_back_button":"← बैलेंस पर वापस","transactions_title":"📊 लेन-देन इतिहास","transactions_empty":"💤 अभी कोई लेन-देन नहीं है",
+"cancel_confirm_yes":"हाँ, रद्द करें","cancel_confirm_no":"नहीं, रहने दें","cancel_confirm_text":"⚠️ <b>क्या आप डील <code>#{deal_id}</code> रद्द करना चाहते हैं?</b>\n\n<i>यह कार्रवाई वापस नहीं की जा सकती।</i>",
+"active_deal_not_found":"❌ सक्रिय डील नहीं मिली।","only_creator_can_cancel":"❌ डील केवल उसका निर्माता रद्द कर सकता है।",
+"wallet_updated":"✅ TON वॉलेट सहेजा गया।","card_updated":"✅ कार्ड विवरण सहेजा गया।","stars_username_updated":"✅ Stars यूज़रनेम सहेजा गया।","usdt_wallet_updated":"✅ USDT वॉलेट सहेजा गया।","btc_wallet_updated":"✅ BTC पता सहेजा गया।",
+"new_wallet":"💎 नया TON वॉलेट दर्ज करें:","new_card":"💳 कार्ड नंबर दर्ज करें:","new_stars_username":"⭐️ Stars यूज़रनेम दर्ज करें (@ के बिना):","new_usdt_wallet":"🪙 USDT (TRC20) पता दर्ज करें:","new_btc_wallet":"🔎 BTC पता दर्ज करें:",
+"my_credentials":"📌 <b>मेरी भुगतान जानकारी</b>","edit_ton":"TON वॉलेट","edit_card":"कार्ड","edit_stars":"@username (Stars)","edit_usdt":"USDT वॉलेट","edit_btc":"BTC पता",
+"req_saved":"✅ भुगतान जानकारी सहेजी गई।","req_prompt":"✏️ {currency} के लिए {currency_name} दर्ज करें\n\n📝 उदाहरण:\n{example}","my_deals_empty":"📭 अभी आपकी कोई डील नहीं है।",
+"lang_changed":"✅ भाषा बदल दी गई है।","language_russian":"रूसी","language_english":"अंग्रेज़ी","language_ukrainian":"यूक्रेनी","language_kazakh":"कज़ाख","language_chinese":"चीनी","language_hindi":"हिंदी",
+"welcome":"Lolz Steam Market में आपका स्वागत है\n\nआपका भरोसेमंद P2P गारंटर:\nNFT और उपहारों के साथ स्वचालित डील\nदोनों पक्षों की पूरी सुरक्षा\nरेफरल प्रोग्राम — कमीशन का 50%\nमैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket\n\nनीचे एक कार्रवाई चुनें",
+},
+}
+
+for _lang, _items in _CORE.items():
+    HTML_LOCALES[_lang].update(_items)
+
+# Russian and English final UI strings.
+HTML_LOCALES["ru"].update({
+    "menu_credentials":"💳 Мои реквизиты","menu_create_deal":"🤝 Создать сделку","menu_balance":"💰 Баланс","menu_my_deals":"📂 Мои сделки","menu_referral":"🔗 Рефералы","lang_button":"🌐 Язык",
+    "back_to_menu":"Назад в меню","back_button":"Назад","choose_language":"🌐 Выберите язык","choose_role":"🎯 Выберите роль","role_seller_button":"Продавец","role_buyer_button":"Покупатель",
+    "cancel_confirm_yes":"Да, отменить","cancel_confirm_no":"Нет, оставить","cancel_confirm_text":"⚠️ <b>Вы уверены, что хотите отменить сделку <code>#{deal_id}</code>?</b>\n\n<i>Это действие необратимо.</i>",
+    "active_deal_not_found":"❌ Активная сделка не найдена.","only_creator_can_cancel":"❌ Отменить сделку может только её создатель.",
+    "lang_changed":"✅ Язык изменён.",
+})
+HTML_LOCALES["en"].update({
+    "menu_credentials":"💳 My credentials","menu_create_deal":"🤝 Create deal","menu_balance":"💰 Balance","menu_my_deals":"📂 My deals","menu_referral":"🔗 Referrals","lang_button":"🌐 Language",
+    "back_to_menu":"Back to menu","back_button":"Back","choose_language":"🌐 Choose language","choose_role":"🎯 Choose role",
+    "cancel_confirm_yes":"Yes, cancel","cancel_confirm_no":"No, keep it","cancel_confirm_text":"⚠️ <b>Are you sure you want to cancel deal <code>#{deal_id}</code>?</b>\n\n<i>This action cannot be undone.</i>",
+    "active_deal_not_found":"❌ Active deal not found.","only_creator_can_cancel":"❌ Only the deal creator can cancel it.","lang_changed":"✅ Language changed.",
+})
+
+# Language selector labels are translated in the currently selected language.
