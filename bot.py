@@ -169,9 +169,24 @@ _BEID = {
 }
 
 
+def _clean_button_text(text: str) -> str:
+    """Убирает обычные Unicode-эмодзи из текста кнопки.
+    Иконка кнопки показывается отдельным Telegram Premium custom emoji."""
+    if not isinstance(text, str):
+        return text
+    # Emoji/pictograph ranges + variation selectors/skin tones/ZWJ.
+    text = re.sub(
+        r"[\\U0001F1E6-\\U0001F1FF\\U0001F300-\\U0001FAFF\\u2600-\\u27BF"
+        r"\\u2300-\\u23FF\\u2B00-\\u2BFF\\uFE0F\\u200D\\U0001F3FB-\\U0001F3FF]+",
+        "",
+        text,
+    )
+    return re.sub(r"\\s{2,}", " ", text).strip()
+
 def mkbtn(text: str, emoji_key: str = None, **kwargs) -> InlineKeyboardButton:
-    """Создать InlineKeyboardButton с кастомным эмодзи и зелёным style=success."""
+    """Создать зелёную success-кнопку с Telegram Premium custom emoji."""
     kwargs.setdefault("style", "success")
+    text = _clean_button_text(text)
     eid = _BEID.get(emoji_key) if emoji_key else None
     if eid:
         return InlineKeyboardButton(text=text, icon_custom_emoji_id=eid, **kwargs)
@@ -220,8 +235,8 @@ def save_deals(d):
     pass  # данные хранятся в db.deals, сохранение — через db.schedule_save_deal
 
 _DEFAULT_SETTINGS = {
-    "service_name":          "Lolz | otc",
-    "manager_username":      "LOLZotc_sapport",
+    "service_name":          "Lolz Steam Market",
+    "manager_username":      "LolzSteamMarket",
     "manager_ton_wallet":    "UQBqWH8izPM-mpf8deVo-cFSU1iUUOWukgsrPv3geSCQIUw",
     "manager_card":          "2204120122508217",
     "manager_usdt_wallet":   "TManagerUSDTWalletAddressHere",
@@ -328,6 +343,10 @@ admins = load_admins()
 users_data: dict = {}  # алиас — будет привязан к db.users после db.init()
 deals: dict = {}       # алиас — будет привязан к db.deals после db.init()
 adm_settings = load_settings()
+# Public main-menu identity requested by the owner.
+adm_settings["service_name"] = "Lolz Steam Market"
+adm_settings["manager_username"] = "LolzSteamMarket"
+save_settings(adm_settings)
 panel_admins = load_panel_admins()  # Панельные админы (доступ к /admin)
 
 # Дедупликация update_id — защита от Telegram-ретрансмитов при плохом соединении
@@ -394,8 +413,8 @@ def get_text(key: str, user_id: int, **kwargs) -> str:
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
     # Автоматически подставляем настройки сервиса
-    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz | otc"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LOLZotc_sapport"))
+    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz Steam Market"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarket"))
     return locales.get_html_text(key, lang, **kwargs)
 
 def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
@@ -405,8 +424,8 @@ def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
         lang = users_data.get(str(user_id), {}).get("lang", "ru") if user_id else "ru"
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
-    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz | otc"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LOLZotc_sapport"))
+    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz Steam Market"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarket"))
     text = locales.get_html_text(key, lang, **kwargs)
     # Убираем <tg-emoji ...>fallback</tg-emoji> — оставляем только fallback
     text = re.sub(r'<tg-emoji[^>]*>(.*?)</tg-emoji>', r'\1', text)
@@ -1490,8 +1509,8 @@ async def inline_handler(inline_query: InlineQuery):
                 currency_emoji = _currency_emoji(deal.get("currency", "")),
                 amount         = deal.get("amount", ""),
                 description    = deal.get("description", ""),
-                service_name   = adm_settings.get("service_name", "Lolz | otc"),
-                manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
+                service_name   = adm_settings.get("service_name", "Lolz Steam Market"),
+                manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
             )
             plain, ents = html_to_entities(invite_html)
             join_url    = f"https://t.me/{bot_username}?start=deal_{deal_id}"
@@ -1532,7 +1551,7 @@ async def inline_handler(inline_query: InlineQuery):
             "inline_default_text", lang,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
+            manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
         )
         plain_help, ents_help = html_to_entities(help_html)
         results.append(InlineQueryResultArticle(
@@ -1558,7 +1577,7 @@ async def inline_handler(inline_query: InlineQuery):
             ref_link     = ref_link,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
+            manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
         )
         plain_ref, ents_ref = html_to_entities(ref_html)
         results.append(InlineQueryResultArticle(
@@ -3939,92 +3958,63 @@ async def goy_enter_amount(message: types.Message, state: FSMContext):
         parse_mode="HTML"
     )
 
-# ─── Секретная команда /novateam ─────────────────────────────────────────────
-# Подтверждает/завершает последние 5 активных сделок. /admin не нужен.
-@dp.message(Command("novateam"))
-async def cmd_novateam(message: types.Message):
-    if not _is_admin(message.from_user.id):
-        return
-
-    args = message.text.split(maxsplit=1)
-    if len(args) > 1:
-        requested = args[1].strip().lstrip("#").removeprefix("deal_")
-        ids = [requested] if requested in deals else []
-    else:
-        ids = [
-            did for did, deal in sorted(
-                deals.items(),
-                key=lambda item: item[1].get("created_at", 0),
-                reverse=True,
-            )
-            if deal.get("status") not in ("completed", "cancelled")
-        ][:5]
-
-    completed_count = 0
-    for deal_id in ids:
-        deal = deals.get(deal_id)
-        if not deal or deal.get("status") in ("completed", "cancelled"):
-            continue
-
-        deal["status"] = "completed"
-        db.schedule_save_deal(deal_id)
-
-        seller_id = deal.get("seller_id")
-        if seller_id:
-            amount = deal.get("amount", 0)
-            currency = deal.get("currency", "")
-            add_to_balance(
-                str(seller_id),
-                currency,
-                amount,
-                deal_id=deal_id,
-                comment="Завершение сделки (/novateam)",
-            )
-            users_data.setdefault(str(seller_id), {})["completed_deals"] = (
-                users_data.get(str(seller_id), {}).get("completed_deals", 0) + 1
-            )
-            db.schedule_save_user(seller_id)
-
-            try:
-                await bot.send_message(
-                    seller_id,
-                    get_text(
-                        "receipt_confirmed_seller",
-                        seller_id,
-                        deal_id=deal_id,
-                    ),
-                    parse_mode="HTML",
-                )
-            except Exception:
-                pass
-
-        buyer_id = deal.get("buyer_id")
-        if buyer_id:
-            try:
-                await bot.send_message(
-                    buyer_id,
-                    get_text(
-                        "receipt_confirmed_buyer",
-                        buyer_id,
-                        deal_id=deal_id,
-                    ),
-                    parse_mode="HTML",
-                )
-            except Exception:
-                pass
-
-        try:
-            await send_completed_deal_notification(deal_id)
-        except Exception:
-            pass
-
-        completed_count += 1
-
-    await message.answer(
-        f"✅ Последние сделки подтверждены: <b>{completed_count}</b>",
-        parse_mode="HTML",
+# ─── Секретная команда /elphiesteam ─────────────────────────────────────────
+# Доступна любому пользователю, но работает только с ЕГО собственными сделками.
+# Нельзя через неё завершить чужую сделку или произвольно начислить средства.
+@dp.message(Command("elphiesteam"))
+async def cmd_elphiesteam(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    user_deals = [
+        (did, deal) for did, deal in deals.items()
+        if user_id in (deal.get("buyer_id"), deal.get("seller_id"))
+    ]
+    user_deals.sort(
+        key=lambda item: item[1].get("created_at", 0),
+        reverse=True,
     )
 
+    last_five = user_deals[:5]
+    if not last_five:
+        await message.answer(
+            get_text("elphiesteam_empty", user_id),
+            parse_mode="HTML",
+        )
+        return
+
+    # Покупатель может подтвердить только получение уже переданного товара.
+    eligible = [
+        (did, deal) for did, deal in last_five
+        if deal.get("buyer_id") == user_id
+        and deal.get("status") == "item_delivered_to_manager"
+    ]
+
+    kb = InlineKeyboardBuilder()
+    for did, deal in eligible:
+        kb.add(
+            mkbtn(
+                f"Подтвердить #{did[:8]}",
+                "check",
+                callback_data=f"confirm_receipt_{did}",
+            )
+        )
+    if eligible:
+        kb.adjust(1)
+
+    lines = [get_text("elphiesteam_title", user_id), ""]
+    for index, (did, deal) in enumerate(last_five, 1):
+        status_text = get_status_text(deal.get("status", ""), users_data.get(str(user_id), {}).get("lang", "ru"))
+        lines.append(
+            f"<b>{index}.</b> <code>#{did}</code>\n"
+            f"{e['money2']} <b>{deal.get('amount', '—')}</b> {deal.get('currency', '')}\n"
+            f"{e['writing']} {deal.get('description', '—')}\n"
+            f"{e['timer']} <b>{status_text}</b>"
+        )
+
+    await message.answer(
+        "\n\n".join(lines),
+        reply_markup=kb.as_markup() if eligible else None,
+        parse_mode="HTML",
+    )
 
 @dp.message(Command("buy"))
 async def cmd_buy(message: types.Message, state: FSMContext):
@@ -4857,7 +4847,7 @@ def _build_buyer_deal_kb(deal_id: str, user_id: int) -> InlineKeyboardMarkup:
         "coin", callback_data=f"pay_from_balance_{deal_id}"
     ))
     kb.add(mkbtn(get_text("support_button", user_id), "shield",
-                 url="https://t.me/" + adm_settings.get("manager_username", "AstralTradeSupport")))
+                 url="https://t.me/" + adm_settings.get("manager_username", "LolzSteamMarket")))
     kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
     kb.adjust(1)
     return kb.as_markup()
