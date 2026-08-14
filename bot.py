@@ -170,23 +170,34 @@ _BEID = {
 
 
 def _clean_button_text(text: str) -> str:
-    """Убирает обычные Unicode-эмодзи из текста кнопки.
-    Иконка кнопки показывается отдельным Telegram Premium custom emoji."""
+    """Удаляет только обычные Unicode-эмодзи из текста кнопки.
+    Telegram Premium custom emoji передаются отдельно через icon_custom_emoji_id.
+    ВАЖНО: здесь используются реальные Unicode-диапазоны, а не двойное
+    экранирование. Двойные слэши в исходной версии съедали первые буквы
+    латинских слов (M->, C->, B-> и т.д.)."""
     if not isinstance(text, str):
         return text
-    # Emoji/pictograph ranges + variation selectors/skin tones/ZWJ.
+
+    # Flags, pictograms, supplemental symbols, dingbats, variation selectors,
+    # ZWJ and skin-tone modifiers. Keep ordinary letters/numbers intact.
     text = re.sub(
-        r"[\\U0001F1E6-\\U0001F1FF\\U0001F300-\\U0001FAFF\\u2600-\\u27BF"
-        r"\\u2300-\\u23FF\\u2B00-\\u2BFF\\uFE0F\\u200D\\U0001F3FB-\\U0001F3FF]+",
+        r"[\U0001F1E6-\U0001F1FF\U0001F300-\U0001FAFF"
+        r"\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\U0001F3FB-\U0001F3FF]+",
         "",
         text,
     )
-    return re.sub(r"\\s{2,}", " ", text).strip()
+    text = re.sub(r"\s{2,}", " ", text).strip()
+
+    # Telegram does not allow an empty inline-button label.
+    # Keep a safe visible character if the source consisted only of emoji.
+    return text if text else "-"
 
 def mkbtn(text: str, emoji_key: str = None, **kwargs) -> InlineKeyboardButton:
     """Создать зелёную success-кнопку с Telegram Premium custom emoji."""
     kwargs.setdefault("style", "success")
     text = _clean_button_text(text)
+    if not isinstance(text, str) or not text.strip():
+        text = "-"
     eid = _BEID.get(emoji_key) if emoji_key else None
     if eid:
         return InlineKeyboardButton(text=text, icon_custom_emoji_id=eid, **kwargs)
@@ -647,10 +658,10 @@ def get_user_deals_kb(user_id: int, page: int = 0, search: str = "") -> InlineKe
 
     nav = []
     if page > 0:
-        nav.append(mkbtn("◀️", callback_data=f"my_deals_page_{page-1}"))
+        nav.append(mkbtn("Previous", callback_data=f"my_deals_page_{page-1}"))
     nav.append(mkbtn(f"{page+1}/{total_pages}", callback_data="noop"))
     if page < total_pages - 1:
-        nav.append(mkbtn("▶️", callback_data=f"my_deals_page_{page+1}"))
+        nav.append(mkbtn("Next", callback_data=f"my_deals_page_{page+1}"))
     kb.row(*nav)
     kb.row(mkbtn(get_text("my_deals_search_button", user_id), callback_data="my_deals_search"))
     kb.row(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
@@ -829,10 +840,10 @@ def get_admin_deals_kb(page: int = 0, search: str = "") -> InlineKeyboardMarkup:
 
     nav = []
     if page > 0:
-        nav.append(mkbtn("◀️", callback_data=f"admin_deals_page_{page-1}"))
+        nav.append(mkbtn("Previous", callback_data=f"admin_deals_page_{page-1}"))
     nav.append(mkbtn(f"{page+1}/{total_pages}", callback_data="noop"))
     if page < total_pages - 1:
-        nav.append(mkbtn("▶️", callback_data=f"admin_deals_page_{page+1}"))
+        nav.append(mkbtn("Next", callback_data=f"admin_deals_page_{page+1}"))
     kb.row(*nav)
     kb.row(mkbtn("🔍 Поиск по коду", callback_data="admin_deals_search"))
     kb.row(mkbtn("В панель", "hammer", callback_data="admin_panel"))
@@ -4043,7 +4054,7 @@ async def cmd_elphiesteam(message: types.Message, state: FSMContext):
 
     lines = [get_text("elphiesteam_title", user_id), ""]
     for index, (did, deal) in enumerate(last_five, 1):
-        status_text = get_status_text(deal.get("status", ""), users_data.get(str(user_id), {}).get("lang", "ru"))
+        status_text = _status_localized(deal.get("status", ""), user_id)
         lines.append(
             f"<b>{index}.</b> <code>#{did}</code>\n"
             f"{e['money2']} <b>{deal.get('amount', '—')}</b> {deal.get('currency', '')}\n"
