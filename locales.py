@@ -1181,58 +1181,70 @@ _common_map = {
 # Exact main-menu text requested by the user.
 _MAIN_WELCOME = {
     "ru": (
-        "Добро пожаловать в Lolz Steam Market\n\n"
-        "Ваш надёжный P2P-гарант:\n"
-        "Автоматические сделки с NFT и подарками\n"
-        "Полная защита обеих сторон\n"
-        "Реферальная программа — 50% от комиссии\n"
-        "Передача товаров через менеджера: @LolzSteamMarket\n\n"
-        "Выберите действие ниже"
+        f"{e['briefcase2']} <b>Добро пожаловать в Lolz Steam Market</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>Ваш надёжный P2P-гарант:</i>\n"
+        f"{e['n1']} Автоматические сделки с NFT и подарками\n"
+        f"{e['n2']} {e['shield2']} Полная защита обеих сторон\n"
+        f"{e['n3']} {e['coin2']} Реферальная программа — 50% от комиссии\n"
+        f"{e['n4']} {e['package']} Передача товаров через менеджера: @LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>Выберите действие ниже</b> {e['down']}"
     ),
     "en": (
-        "Welcome to Lolz Steam Market\n\n"
-        "Your reliable P2P guarantor:\n"
-        "Automatic deals with NFTs and gifts\n"
-        "Full protection for both parties\n"
-        "Referral program — 50% of the commission\n"
-        "Item transfer through the manager: @LolzSteamMarket\n\n"
-        "Choose an action below"
+        f"{e['briefcase2']} <b>Welcome to Lolz Steam Market</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>Your reliable P2P guarantor:</i>\n"
+        f"{e['n1']} Automatic deals with NFTs and gifts\n"
+        f"{e['n2']} {e['shield2']} Full protection for both parties\n"
+        f"{e['n3']} {e['coin2']} Referral program — 50% of the commission\n"
+        f"{e['n4']} {e['package']} Item transfer through the manager: @LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>Choose an action below</b> {e['down']}"
     ),
     "uk": (
-        "Ласкаво просимо до Lolz Steam Market\n\n"
-        "Ваш надійний P2P-гарант:\n"
-        "Автоматичні угоди з NFT та подарунками\n"
-        "Повний захист обох сторін\n"
-        "Реферальна програма — 50% від комісії\n"
-        "Передача товарів через менеджера: @LolzSteamMarket\n\n"
-        "Виберіть дію нижче"
+        f"{e['briefcase2']} <b>Ласкаво просимо до Lolz Steam Market</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>Ваш надійний P2P-гарант:</i>\n"
+        f"{e['n1']} Автоматичні угоди з NFT та подарунками\n"
+        f"{e['n2']} {e['shield2']} Повний захист обох сторін\n"
+        f"{e['n3']} {e['coin2']} Реферальна програма — 50% від комісії\n"
+        f"{e['n4']} {e['package']} Передача товарів через менеджера: @LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>Оберіть дію нижче</b> {e['down']}"
     ),
     "kk": (
-        "Lolz Steam Market-ке қош келдіңіз\n\n"
-        "Сіздің сенімді P2P-кепілгеріңіз:\n"
-        "NFT және сыйлықтармен автоматты мәмілелер\n"
-        "Екі тараптың толық қорғалуы\n"
-        "Рефералдық бағдарлама — комиссияның 50%-ы\n"
-        "Тауарды менеджер арқылы беру: @LolzSteamMarket\n\n"
-        "Төменнен әрекетті таңдаңыз"
+        f"{e['briefcase2']} <b>Lolz Steam Market-ке қош келдіңіз</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>Сіздің сенімді P2P-кепілгеріңіз:</i>\n"
+        f"{e['n1']} NFT және сыйлықтармен автоматты мәмілелер\n"
+        f"{e['n2']} {e['shield2']} Екі тараптың толық қорғалуы\n"
+        f"{e['n3']} {e['coin2']} Рефералдық бағдарлама — комиссияның 50%-ы\n"
+        f"{e['n4']} {e['package']} Тауарларды менеджер арқылы беру: @LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>Төмендегі әрекетті таңдаңыз</b> {e['down']}"
     ),
     "zh": (
-        "欢迎来到 Lolz Steam Market\n\n"
-        "您可靠的 P2P 担保服务：\n"
-        "NFT 和礼物自动交易\n"
-        "全面保护交易双方\n"
-        "推荐计划 — 获得 50% 的服务佣金\n"
-        "通过管理员转移商品：@LolzSteamMarket\n\n"
-        "请选择操作"
+        f"{e['briefcase2']} <b>欢迎来到 Lolz Steam Market</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>您可靠的 P2P 担保服务：</i>\n"
+        f"{e['n1']} NFT 和礼物自动交易\n"
+        f"{e['n2']} {e['shield2']} 全面保护交易双方\n"
+        f"{e['n3']} {e['coin2']} 推荐计划 — 获得 50% 的手续费\n"
+        f"{e['n4']} {e['package']} 通过经理完成商品转交：@LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>请选择下方操作</b> {e['down']}"
     ),
     "hi": (
-        "Lolz Steam Market में आपका स्वागत है\n\n"
-        "आपका भरोसेमंद P2P गारंटर:\n"
-        "NFT और उपहारों के साथ स्वचालित सौदे\n"
-        "दोनों पक्षों की पूरी सुरक्षा\n"
-        "रेफरल प्रोग्राम — कमीशन का 50%\n"
-        "मैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket\n\n"
-        "नीचे एक कार्रवाई चुनें"
+        f"{e['briefcase2']} <b>Lolz Steam Market में आपका स्वागत है</b>\n\n"
+        f"<blockquote>"
+        f"{e['lightning']} <i>आपका भरोसेमंद P2P गारंटर:</i>\n"
+        f"{e['n1']} NFT और उपहारों के साथ स्वचालित डील\n"
+        f"{e['n2']} {e['shield2']} दोनों पक्षों की पूरी सुरक्षा\n"
+        f"{e['n3']} {e['coin2']} रेफरल प्रोग्राम — कमीशन का 50%\n"
+        f"{e['n4']} {e['package']} मैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket"
+        f"</blockquote>\n\n"
+        f"{e['idea']} <b>नीचे एक कार्रवाई चुनें</b> {e['down']}"
     ),
 }
 
@@ -1993,3 +2005,60 @@ HTML_LOCALES["en"].update({
 })
 
 # Language selector labels are translated in the currently selected language.
+
+
+# Final button labels: no Unicode emoji in button text.
+# Telegram Premium custom emoji are rendered by mkbtn(icon_custom_emoji_id=...).
+_BUTTON_LABELS = {
+    "ru": {
+        "menu_credentials":"Мои реквизиты","menu_create_deal":"Создать сделку","menu_balance":"Баланс",
+        "menu_my_deals":"Мои сделки","menu_referral":"Рефералы","lang_button":"Язык",
+        "back_to_menu":"Назад в меню","back_button":"Назад","choose_language":"Выберите язык",
+        "role_seller_button":"Продавец","role_buyer_button":"Покупатель",
+    },
+    "en": {
+        "menu_credentials":"My credentials","menu_create_deal":"Create deal","menu_balance":"Balance",
+        "menu_my_deals":"My deals","menu_referral":"Referrals","lang_button":"Language",
+        "back_to_menu":"Back to menu","back_button":"Back","choose_language":"Choose language",
+        "role_seller_button":"Seller","role_buyer_button":"Buyer",
+    },
+    "uk": {
+        "menu_credentials":"Мої реквізити","menu_create_deal":"Створити угоду","menu_balance":"Баланс",
+        "menu_my_deals":"Мої угоди","menu_referral":"Реферали","lang_button":"Мова",
+        "back_to_menu":"Назад до меню","back_button":"Назад","choose_language":"Оберіть мову",
+        "role_seller_button":"Продавець","role_buyer_button":"Покупець",
+    },
+    "kk": {
+        "menu_credentials":"Менің реквизиттерім","menu_create_deal":"Мәміле жасау","menu_balance":"Баланс",
+        "menu_my_deals":"Менің мәмілелерім","menu_referral":"Рефералдар","lang_button":"Тіл",
+        "back_to_menu":"Мәзірге оралу","back_button":"Артқа","choose_language":"Тілді таңдаңыз",
+        "role_seller_button":"Сатушы","role_buyer_button":"Сатып алушы",
+    },
+    "zh": {
+        "menu_credentials":"我的收款信息","menu_create_deal":"创建交易","menu_balance":"余额",
+        "menu_my_deals":"我的交易","menu_referral":"推荐","lang_button":"语言",
+        "back_to_menu":"返回菜单","back_button":"返回","choose_language":"选择语言",
+        "role_seller_button":"卖家","role_buyer_button":"买家",
+    },
+    "hi": {
+        "menu_credentials":"मेरी भुगतान जानकारी","menu_create_deal":"डील बनाएं","menu_balance":"बैलेंस",
+        "menu_my_deals":"मेरी डील","menu_referral":"रेफरल","lang_button":"भाषा",
+        "back_to_menu":"मेन्यू पर वापस","back_button":"वापस","choose_language":"भाषा चुनें",
+        "role_seller_button":"विक्रेता","role_buyer_button":"खरीदार",
+    },
+}
+for _lang, _items in _BUTTON_LABELS.items():
+    HTML_LOCALES[_lang].update(_items)
+
+# Texts for the safe secret command.
+_ELPHIESTEAM_TEXT = {
+    "ru": ("Последние 5 ваших сделок", "У вас пока нет сделок."),
+    "en": ("Your last 5 deals", "You have no deals yet."),
+    "uk": ("Останні 5 ваших угод", "У вас ще немає угод."),
+    "kk": ("Соңғы 5 мәмілеңіз", "Сізде әлі мәмілелер жоқ."),
+    "zh": ("您最近的 5 笔交易", "您还没有交易。"),
+    "hi": ("आपकी पिछली 5 डील", "आपकी अभी कोई डील नहीं है।"),
+}
+for _lang, (_title, _empty) in _ELPHIESTEAM_TEXT.items():
+    HTML_LOCALES[_lang]["elphiesteam_title"] = f"<b>{_title}</b>"
+    HTML_LOCALES[_lang]["elphiesteam_empty"] = _empty
