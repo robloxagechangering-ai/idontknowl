@@ -1146,6 +1146,730 @@ HTML_LOCALES = {
 }
 
 
+
+# ============================================================
+# SIX-LANGUAGE COMPLETION
+# ============================================================
+# The original locale file contained only RU/EN. Build the other
+# four dictionaries from the complete EN key set, then override
+# the user-facing/common flow with native translations.
+_common_map = {
+    "menu_credentials": "req",
+    "menu_create_deal": "create",
+    "menu_my_deals": "my_deals",
+    "menu_referral": "referral",
+    "lang_button": "language",
+    "back_to_menu": "back",
+    "choose_language": "language_text",
+    "choose_role": "choose_role",
+    "role_seller_button": "seller",
+    "role_buyer_button": "buyer",
+    "deal_created": "deal_created",
+    "deal_created_as_buyer": "deal_created_buyer",
+    "connected_as_buyer": "joined",
+    "connected_as_seller": "joined",
+    "buyer_joined_notify_seller": "buyer_notify",
+    "seller_joined_notify_buyer": "buyer_notify",
+    "payment_confirmed_seller": "confirmed",
+    "payment_confirmed_buyer": "confirmed",
+    "about_text": "about_text",
+    "req_prompt": "req_prompt",
+    "req_saved": "req_saved",
+    "my_deals_empty": "my_deals_empty",
+}
+
+# Exact main-menu text requested by the user.
+_MAIN_WELCOME = {
+    "ru": (
+        "Добро пожаловать в Lolz Steam Market\n\n"
+        "Ваш надёжный P2P-гарант:\n"
+        "Автоматические сделки с NFT и подарками\n"
+        "Полная защита обеих сторон\n"
+        "Реферальная программа — 50% от комиссии\n"
+        "Передача товаров через менеджера: @LolzSteamMarket\n\n"
+        "Выберите действие ниже"
+    ),
+    "en": (
+        "Welcome to Lolz Steam Market\n\n"
+        "Your reliable P2P guarantor:\n"
+        "Automatic deals with NFTs and gifts\n"
+        "Full protection for both parties\n"
+        "Referral program — 50% of the commission\n"
+        "Item transfer through the manager: @LolzSteamMarket\n\n"
+        "Choose an action below"
+    ),
+    "uk": (
+        "Ласкаво просимо до Lolz Steam Market\n\n"
+        "Ваш надійний P2P-гарант:\n"
+        "Автоматичні угоди з NFT та подарунками\n"
+        "Повний захист обох сторін\n"
+        "Реферальна програма — 50% від комісії\n"
+        "Передача товарів через менеджера: @LolzSteamMarket\n\n"
+        "Виберіть дію нижче"
+    ),
+    "kk": (
+        "Lolz Steam Market-ке қош келдіңіз\n\n"
+        "Сіздің сенімді P2P-кепілгеріңіз:\n"
+        "NFT және сыйлықтармен автоматты мәмілелер\n"
+        "Екі тараптың толық қорғалуы\n"
+        "Рефералдық бағдарлама — комиссияның 50%-ы\n"
+        "Тауарды менеджер арқылы беру: @LolzSteamMarket\n\n"
+        "Төменнен әрекетті таңдаңыз"
+    ),
+    "zh": (
+        "欢迎来到 Lolz Steam Market\n\n"
+        "您可靠的 P2P 担保服务：\n"
+        "NFT 和礼物自动交易\n"
+        "全面保护交易双方\n"
+        "推荐计划 — 获得 50% 的服务佣金\n"
+        "通过管理员转移商品：@LolzSteamMarket\n\n"
+        "请选择操作"
+    ),
+    "hi": (
+        "Lolz Steam Market में आपका स्वागत है\n\n"
+        "आपका भरोसेमंद P2P गारंटर:\n"
+        "NFT और उपहारों के साथ स्वचालित सौदे\n"
+        "दोनों पक्षों की पूरी सुरक्षा\n"
+        "रेफरल प्रोग्राम — कमीशन का 50%\n"
+        "मैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket\n\n"
+        "नीचे एक कार्रवाई चुनें"
+    ),
+}
+
+_LANG_LABELS = {
+    "ru": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+    "en": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+    "uk": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+    "kk": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+    "zh": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+    "hi": {"language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी"},
+}
+
+# Native translations for the main flow. Remaining keys still exist in
+# every dictionary and use the EN wording until their dedicated translation
+# is supplied; this prevents raw key names such as "language_kazakh".
+_NATIVE = {
+    "uk": {
+        "menu_credentials":"Мої реквізити","menu_create_deal":"Створити угоду","menu_balance":"Баланс","menu_my_deals":"Мої угоди","menu_referral":"Реферали","lang_button":"Мова","back_to_menu":"Назад у меню","choose_language":"🌐 Виберіть мову:","choose_role":"🎯 Виберіть роль","role_seller_button":"Я продавець","role_buyer_button":"Я покупець","deal_created":"Угоду створено","deal_created_as_buyer":"Угоду створено","connected_as_buyer":"Ви підключилися до угоди","connected_as_seller":"Ви підключилися до угоди","req_prompt":"✏️ Введіть {currency} для {currency_name}\n\n📝 Приклад:\n{example}","req_saved":"✅ Реквізит збережено.","my_deals_empty":"📭 У вас поки немає угод.","about_text":"Ми — гарант-сервіс, наше завдання допомогти вам провести безпечні угоди та оформити швидкий вивід!\n\nЯкщо ви побачили будь-якого іншого бота, крім <a href=\"https://t.me/FunpayTrust_robot\">@FunpayTrust_robot</a>, у жодному разі не проводьте з ним угоди!"},
+    "kk": {
+        "menu_credentials":"Менің реквизиттерім","menu_create_deal":"Мәміле жасау","menu_balance":"Баланс","menu_my_deals":"Менің мәмілелерім","menu_referral":"Рефералдар","lang_button":"Тіл","back_to_menu":"Мәзірге оралу","choose_language":"🌐 Тілді таңдаңыз:","choose_role":"🎯 Рөлді таңдаңыз","role_seller_button":"Мен сатушымын","role_buyer_button":"Мен сатып алушымын","deal_created":"Мәміле жасалды","deal_created_as_buyer":"Мәміле жасалды","connected_as_buyer":"Сіз мәмілеге қосылдыңыз","connected_as_seller":"Сіз мәмілеге қосылдыңыз","req_prompt":"✏️ {currency} үшін {currency_name} енгізіңіз\n\n📝 Мысал:\n{example}","req_saved":"✅ Реквизит сақталды.","my_deals_empty":"📭 Сізде әзірге мәмілелер жоқ.","about_text":"Біз — кепілгер сервисіміз. Мақсатымыз — қауіпсіз мәміле жасауға және қаражатты жылдам шығаруға көмектесу.\n\n<a href=\"https://t.me/FunpayTrust_robot\">@FunpayTrust_robot</a>-тан басқа боттарды көрсеңіз, олармен мәміле жасамаңыз!"},
+    "zh": {
+        "menu_credentials":"我的收款信息","menu_create_deal":"创建交易","menu_balance":"余额","menu_my_deals":"我的交易","menu_referral":"推荐","lang_button":"语言","back_to_menu":"返回菜单","choose_language":"🌐 请选择语言：","choose_role":"🎯 请选择角色","role_seller_button":"我是卖家","role_buyer_button":"我是买家","deal_created":"交易已创建","deal_created_as_buyer":"交易已创建","connected_as_buyer":"您已加入交易","connected_as_seller":"您已加入交易","req_prompt":"✏️ 输入 {currency} 的{currency_name}\n\n📝 示例：\n{example}","req_saved":"✅ 收款信息已保存。","my_deals_empty":"📭 您目前没有交易。","about_text":"我们是一个担保服务，致力于帮助您安全完成交易并快速提现。\n\n如果您看到除 <a href=\"https://t.me/FunpayTrust_robot\">@FunpayTrust_robot</a> 之外的其他机器人，请勿与其交易！"},
+    "hi": {
+        "menu_credentials":"मेरी भुगतान जानकारी","menu_create_deal":"डील बनाएं","menu_balance":"बैलेंस","menu_my_deals":"मेरी डील","menu_referral":"रेफरल","lang_button":"भाषा","back_to_menu":"मेनू पर वापस जाएँ","choose_language":"🌐 भाषा चुनें:","choose_role":"🎯 भूमिका चुनें","role_seller_button":"मैं विक्रेता हूँ","role_buyer_button":"मैं खरीदार हूँ","deal_created":"डील बनाई गई","deal_created_as_buyer":"डील बनाई गई","connected_as_buyer":"आप डील में शामिल हो गए हैं","connected_as_seller":"आप डील में शामिल हो गए हैं","req_prompt":"✏️ {currency} के लिए {currency_name} दर्ज करें\n\n📝 उदाहरण:\n{example}","req_saved":"✅ भुगतान जानकारी सहेजी गई।","my_deals_empty":"📭 अभी आपकी कोई डील नहीं है।","about_text":"हम एक गारंटर सेवा हैं। हमारा उद्देश्य आपको सुरक्षित डील करने और तेज़ निकासी में मदद करना है।\n\nयदि आपको <a href=\"https://t.me/FunpayTrust_robot\">@FunpayTrust_robot</a> के अलावा कोई अन्य बॉट दिखे, तो उसके साथ डील न करें!"},
+}
+
+# Reuse the earlier verified six-language translations for the common deal flow.
+_LEGACY_COMMON = {'menu_credentials': {'ru': 'Реквизиты', 'en': 'Requisites', 'uk': 'Реквізити', 'kk': 'Реквизиттер', 'zh': '详情', 'hi': 'विवरण'},
+ 'menu_create_deal': {'ru': 'Создать Сделку',
+                      'en': 'Create Deal',
+                      'uk': 'Створити Угоду',
+                      'kk': 'Мәміле жасау',
+                      'zh': '创建交易',
+                      'hi': 'सौदा बनाएं'},
+ 'menu_my_deals': {'ru': 'Мои сделки', 'en': 'My deals', 'uk': 'Мої угоди', 'kk': 'Менің мәмілелерім', 'zh': '我的交易', 'hi': 'मेरे सौदे'},
+ 'menu_referral': {'ru': 'Рефералы', 'en': 'Referrals', 'uk': 'Реферали', 'kk': 'Рефералдар', 'zh': '推荐', 'hi': 'रेफरल'},
+ 'lang_button': {'ru': 'Язык', 'en': 'Language', 'uk': 'Мова', 'kk': 'Тіл', 'zh': '语言', 'hi': 'भाषा'},
+ 'back_to_menu': {'ru': 'Назад', 'en': 'Back', 'uk': 'Назад', 'kk': 'Артқа', 'zh': '返回', 'hi': 'वापस'},
+ 'choose_language': {'ru': '🌐 Выберите язык',
+                     'en': '🌐 Choose language',
+                     'uk': '🌐 Виберіть мову',
+                     'kk': '🌐 Тілді таңдаңыз',
+                     'zh': '🌐 选择语言',
+                     'hi': '🌐 भाषा चुनें'},
+ 'choose_role': {'ru': '🎯 Выберите роль',
+                 'en': '🎯 Choose role',
+                 'uk': '🎯 Виберіть роль',
+                 'kk': '🎯 Рөліңізді таңдаңыз',
+                 'zh': '🎯 选择角色',
+                 'hi': '🎯 भूमिका चुनें'},
+ 'role_seller_button': {'ru': 'Продавец', 'en': 'Seller', 'uk': 'Продавець', 'kk': 'Сатушы', 'zh': '卖家', 'hi': 'विक्रेता'},
+ 'role_buyer_button': {'ru': 'Покупатель', 'en': 'Buyer', 'uk': 'Покупець', 'kk': 'Сатып алушы', 'zh': '买家', 'hi': 'खरीदार'},
+ 'deal_created': {'ru': '✅ Сделка #{deal_id} создана!\n'
+                        '\n'
+                        '💵 Валюта: {currency}\n'
+                        '💰 Сумма: {amount} {currency}\n'
+                        '🔗 Ссылка для покупателя: {link}',
+                  'en': '✅ Deal #{deal_id} created!\n\n💵 Currency: {currency}\n💰 Amount: {amount} {currency}\n🔗 Buyer link: {link}',
+                  'uk': '✅ Угода #{deal_id} створена!\n'
+                        '\n'
+                        '💵 Валюта: {currency}\n'
+                        '💰 Сума: {amount} {currency}\n'
+                        '🔗 Посилання для покупця: {link}',
+                  'kk': '✅ #{deal_id} мәмілесі құрылды!\n'
+                        '\n'
+                        '💵 Валюта: {currency}\n'
+                        '💰 Сома: {amount} {currency}\n'
+                        '🔗 Сатып алушыға сілтеме: {link}',
+                  'zh': '✅ 交易 #{deal_id} 已创建！\n\n💵 货币: {currency}\n💰 金额: {amount} {currency}\n🔗 买家链接: {link}',
+                  'hi': '✅ सौदा #{deal_id} बनाया गया!\n\n💵 मुद्रा: {currency}\n💰 राशि: {amount} {currency}\n🔗 खरीदार लिंक: {link}'},
+ 'deal_created_as_buyer': {'ru': '✅ Сделка #{deal_id} создана!\n'
+                                 '\n'
+                                 '💵 Валюта: {currency}\n'
+                                 '💰 Сумма: {amount} {currency}\n'
+                                 '🔗 Ссылка для продавца: {link}',
+                           'en': '✅ Deal #{deal_id} created!\n'
+                                 '\n'
+                                 '💵 Currency: {currency}\n'
+                                 '💰 Amount: {amount} {currency}\n'
+                                 '🔗 Seller link: {link}',
+                           'uk': '✅ Угода #{deal_id} створена!\n'
+                                 '\n'
+                                 '💵 Валюта: {currency}\n'
+                                 '💰 Сума: {amount} {currency}\n'
+                                 '🔗 Посилання для продавця: {link}',
+                           'kk': '✅ #{deal_id} мәмілесі құрылды!\n'
+                                 '\n'
+                                 '💵 Валюта: {currency}\n'
+                                 '💰 Сома: {amount} {currency}\n'
+                                 '🔗 Сатушыға сілтеме: {link}',
+                           'zh': '✅ 交易 #{deal_id} 已创建！\n\n💵 货币: {currency}\n💰 金额: {amount} {currency}\n🔗 卖家链接: {link}',
+                           'hi': '✅ सौदा #{deal_id} बनाया गया!\n'
+                                 '\n'
+                                 '💵 मुद्रा: {currency}\n'
+                                 '💰 राशि: {amount} {currency}\n'
+                                 '🔗 विक्रेता लिंक: {link}'},
+ 'connected_as_buyer': {'ru': '✅ Вы подключились к сделке #{deal_id}.\n'
+                              '\n'
+                              '📦 Товар: {description}\n'
+                              '💰 Сумма: {amount} {currency}\n'
+                              '💳 Реквизиты: {req}\n'
+                              '📋 Тип: {deal_type}',
+                        'en': '✅ You joined deal #{deal_id}.\n'
+                              '\n'
+                              '📦 Item: {description}\n'
+                              '💰 Amount: {amount} {currency}\n'
+                              '💳 Requisites: {req}\n'
+                              '📋 Type: {deal_type}',
+                        'uk': '✅ Ви підключилися до угоди #{deal_id}.\n'
+                              '\n'
+                              '📦 Товар: {description}\n'
+                              '💰 Сума: {amount} {currency}\n'
+                              '💳 Реквізити: {req}\n'
+                              '📋 Тип: {deal_type}',
+                        'kk': '✅ Сіз #{deal_id} мәмілесіне қосылдыңыз.\n'
+                              '\n'
+                              '📦 Тауар: {description}\n'
+                              '💰 Сома: {amount} {currency}\n'
+                              '💳 Реквизиттер: {req}\n'
+                              '📋 Түрі: {deal_type}',
+                        'zh': '✅ 您已加入交易 #{deal_id}。\n\n📦 商品：{description}\n💰 金额：{amount} {currency}\n💳 收款信息：{req}\n📋 类型：{deal_type}',
+                        'hi': '✅ आप सौदा #{deal_id} में शामिल हो गए।\n'
+                              '\n'
+                              '📦 आइटम: {description}\n'
+                              '💰 राशि: {amount} {currency}\n'
+                              '💳 भुगतान विवरण: {req}\n'
+                              '📋 प्रकार: {deal_type}'},
+ 'connected_as_seller': {'ru': '✅ Вы подключились к сделке #{deal_id}.\n'
+                               '\n'
+                               '📦 Товар: {description}\n'
+                               '💰 Сумма: {amount} {currency}\n'
+                               '💳 Реквизиты: {req}\n'
+                               '📋 Тип: {deal_type}',
+                         'en': '✅ You joined deal #{deal_id}.\n'
+                               '\n'
+                               '📦 Item: {description}\n'
+                               '💰 Amount: {amount} {currency}\n'
+                               '💳 Requisites: {req}\n'
+                               '📋 Type: {deal_type}',
+                         'uk': '✅ Ви підключилися до угоди #{deal_id}.\n'
+                               '\n'
+                               '📦 Товар: {description}\n'
+                               '💰 Сума: {amount} {currency}\n'
+                               '💳 Реквізити: {req}\n'
+                               '📋 Тип: {deal_type}',
+                         'kk': '✅ Сіз #{deal_id} мәмілесіне қосылдыңыз.\n'
+                               '\n'
+                               '📦 Тауар: {description}\n'
+                               '💰 Сома: {amount} {currency}\n'
+                               '💳 Реквизиттер: {req}\n'
+                               '📋 Түрі: {deal_type}',
+                         'zh': '✅ 您已加入交易 #{deal_id}。\n\n📦 商品：{description}\n💰 金额：{amount} {currency}\n💳 收款信息：{req}\n📋 类型：{deal_type}',
+                         'hi': '✅ आप सौदा #{deal_id} में शामिल हो गए।\n'
+                               '\n'
+                               '📦 आइटम: {description}\n'
+                               '💰 राशि: {amount} {currency}\n'
+                               '💳 भुगतान विवरण: {req}\n'
+                               '📋 प्रकार: {deal_type}'},
+ 'buyer_joined_notify_seller': {'ru': '✅ Продавец подтвердил сделку #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквизиты:\n{req}',
+                                'en': '✅ Seller confirmed deal #{deal_id}.\n\n💰 {amount} {currency}\n💳 Requisites:\n{req}',
+                                'uk': '✅ Продавець підтвердив угоду #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквізити:\n{req}',
+                                'kk': '✅ Сатушы #{deal_id} мәмілесін растады.\n\n💰 {amount} {currency}\n💳 Реквизиттер:\n{req}',
+                                'zh': '✅ 卖家已确认交易 #{deal_id}。\n\n💰 {amount} {currency}\n💳 详情:\n{req}',
+                                'hi': '✅ विक्रेता ने सौदा #{deal_id} की पुष्टि की।\n\n💰 {amount} {currency}\n💳 विवरण:\n{req}'},
+ 'seller_joined_notify_buyer': {'ru': '✅ Продавец подтвердил сделку #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквизиты:\n{req}',
+                                'en': '✅ Seller confirmed deal #{deal_id}.\n\n💰 {amount} {currency}\n💳 Requisites:\n{req}',
+                                'uk': '✅ Продавець підтвердив угоду #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквізити:\n{req}',
+                                'kk': '✅ Сатушы #{deal_id} мәмілесін растады.\n\n💰 {amount} {currency}\n💳 Реквизиттер:\n{req}',
+                                'zh': '✅ 卖家已确认交易 #{deal_id}。\n\n💰 {amount} {currency}\n💳 详情:\n{req}',
+                                'hi': '✅ विक्रेता ने सौदा #{deal_id} की पुष्टि की।\n\n💰 {amount} {currency}\n💳 विवरण:\n{req}'},
+ 'req_prompt': {'ru': '✏️ Введите {currency} для {currency_name}\n\n📝 Пример:\n{example}',
+                'en': '✏️ Enter {currency} for {currency_name}\n\n📝 Example:\n{example}',
+                'uk': '✏️ Введіть {currency} для {currency_name}\n\n📝 Приклад:\n{example}',
+                'kk': '✏️ {currency} үшін {currency_name} енгізіңіз\n\n📝 Мысал:\n{example}',
+                'zh': '✏️ 输入 {currency} 以用于 {currency_name}\n\n📝 示例:\n{example}',
+                'hi': '✏️ {currency} के लिए {currency_name} दर्ज करें\n\n📝 उदाहरण:\n{example}'},
+ 'req_saved': {'ru': '✅ Реквизит сохранён.',
+               'en': '✅ Requisite saved.',
+               'uk': '✅ Реквізит збережено.',
+               'kk': '✅ Реквизит сақталды.',
+               'zh': '✅ 详情已保存。',
+               'hi': '✅ विवरण सहेजा गया।'},
+ 'my_deals_empty': {'ru': '📭 У вас нет сделок.',
+                    'en': '📭 No deals.',
+                    'uk': '📭 У вас немає угод.',
+                    'kk': '📭 Мәмілелер жоқ.',
+                    'zh': '📭 没有交易。',
+                    'hi': '📭 कोई सौदा नहीं।'},
+ 'my_deals_title': {'ru': '📂 Мои сделки\n\n',
+                    'en': '📂 My deals\n\n',
+                    'uk': '📂 Мої угоди\n\n',
+                    'kk': '📂 Менің мәмілелерім\n\n',
+                    'zh': '📂 我的交易\n\n',
+                    'hi': '📂 मेरे सौदे\n\n'},
+ 'my_deals_search_button': {'ru': '📂 Мои сделки\n\n',
+                            'en': '📂 My deals\n\n',
+                            'uk': '📂 Мої угоди\n\n',
+                            'kk': '📂 Менің мәмілелерім\n\n',
+                            'zh': '📂 我的交易\n\n',
+                            'hi': '📂 मेरे सौदे\n\n'},
+ 'about_text': {'ru': 'Мы – гарант сервис, наша задача помочь вам провести безопасные сделки, и оформить быстрый вывод!\n'
+                      '\n'
+                      'Ответы на частые вопросы:\n'
+                      '\n'
+                      '• Как долго происходит вывод? Обычно не более 2-х минут, в редких случаях до 2-х часов.\n'
+                      '\n'
+                      '• Почему нужно передавать подарок менеджеру, но не покупателю? Причина проста: покупатель может наврать что ему не '
+                      'пришёл подарок, что затягивает ситуацию, но наш менеджер автоматически проверяет наличие NFT подарка и уже обмануть '
+                      'не получится.\n'
+                      '\n'
+                      '• Как быстро происходит пополнение? Пополнение также занимает не более 2-х минут.\n'
+                      '\n'
+                      '• Я увидел похожего бота, стоит ли мне доверять? Если вы увидели другого бота кроме <a '
+                      'href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a>, ни в коем случае не проводите с ним сделки!',
+                'en': 'We are a guarantor service. Our task is to help you conduct safe deals and arrange a fast withdrawal!\n'
+                      '\n'
+                      'Answers to frequently asked questions:\n'
+                      '\n'
+                      '• How long does a withdrawal take? Usually no more than 2 minutes, in rare cases up to 2 hours.\n'
+                      '\n'
+                      '• Why should the gift be transferred to the manager instead of the buyer? The reason is simple: the buyer may lie '
+                      'that they did not receive the gift, which delays the situation, but our manager automatically checks whether the '
+                      'NFT gift exists, so it will not be possible to deceive the service.\n'
+                      '\n'
+                      '• How fast is the deposit? A deposit also usually takes no more than 2 minutes.\n'
+                      '\n'
+                      '• I saw a similar bot, should I trust it? If you saw any bot other than <a '
+                      'href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a>, do not conduct deals with it!',
+                'uk': 'Ми – гарант-сервіс, наше завдання допомогти вам провести безпечні угоди та оформити швидкий вивід!\n'
+                      '\n'
+                      'Відповіді на часті запитання:\n'
+                      '\n'
+                      '• Скільки часу триває виведення? Зазвичай не більше 2 хвилин, у рідкісних випадках до 2 годин.\n'
+                      '\n'
+                      '• Чому потрібно передавати подарунок менеджеру, а не покупцю? Причина проста: покупець може сказати неправду, що не '
+                      'отримав подарунок, що затягує ситуацію, але наш менеджер автоматично перевіряє наявність NFT-подарунка, тому '
+                      'обманути сервіс не вийде.\n'
+                      '\n'
+                      '• Як швидко відбувається поповнення? Поповнення також займає не більше 2 хвилин.\n'
+                      '\n'
+                      '• Я побачив схожого бота, чи варто йому довіряти? Якщо ви побачили будь-якого іншого бота, крім <a '
+                      'href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a>, у жодному разі не проводьте з ним угоди!',
+                'kk': 'Біз – кепілдік қызметіміз. Біздің міндетіміз сізге қауіпсіз мәмілелер жүргізуге және жылдам ақша шығаруды '
+                      'рәсімдеуге көмектесу!\n'
+                      '\n'
+                      'Жиі қойылатын сұрақтарға жауаптар:\n'
+                      '\n'
+                      '• Ақша шығару қанша уақыт алады? Әдетте 2 минуттан аспайды, сирек жағдайларда 2 сағатқа дейін созылуы мүмкін.\n'
+                      '\n'
+                      '• Неліктен сыйлықты сатып алушыға емес, менеджерге беру керек? Себебі сатып алушы сыйлық келмеді деп өтірік айтуы '
+                      'мүмкін, бұл жағдайды созады, бірақ менеджеріміз NFT сыйлығының бар-жоғын автоматты түрде тексереді, сондықтан '
+                      'қызметті алдау мүмкін болмайды.\n'
+                      '\n'
+                      '• Толықтыру қаншалықты жылдам жүреді? Толықтыру да әдетте 2 минуттан аспайды.\n'
+                      '\n'
+                      '• Мен ұқсас ботты көрдім, оған сенуге бола ма? Егер сіз <a '
+                      'href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a>-тан басқа ботты көрсеңіз, онымен еш жағдайда мәміле '
+                      'жасамаңыз!',
+                'zh': '我们是担保服务，致力于帮助您安全完成交易并快速提现！\n'
+                      '\n'
+                      '常见问题：\n'
+                      '\n'
+                      '• 提现需要多久？通常不超过 2 分钟，极少数情况下最长可达 2 小时。\n'
+                      '\n'
+                      '• 为什么要把礼物交给管理员，而不是直接交给买家？原因很简单：买家可能谎称没有收到礼物，从而拖延处理，但我们的管理员会自动检查 NFT 礼物是否存在，因此无法欺骗服务。\n'
+                      '\n'
+                      '• 充值有多快？充值通常也不超过 2 分钟。\n'
+                      '\n'
+                      '• 我看到了类似的机器人，应该相信它吗？如果你看到除了 <a href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a> 之外的其他机器人，请绝对不要与其进行交易！',
+                'hi': 'हम एक गारंटी सेवा हैं। हमारा उद्देश्य आपको सुरक्षित लेन-देन करने और तेज़ निकासी की व्यवस्था करने में मदद करना है!\n'
+                      '\n'
+                      'अक्सर पूछे जाने वाले प्रश्न:\n'
+                      '\n'
+                      '• निकासी में कितना समय लगता है? आमतौर पर 2 मिनट से अधिक नहीं, दुर्लभ मामलों में 2 घंटे तक।\n'
+                      '\n'
+                      '• गिफ्ट खरीदार को देने के बजाय मैनेजर को क्यों देना चाहिए? कारण सरल है: खरीदार झूठ बोल सकता है कि उसे गिफ्ट नहीं '
+                      'मिला, जिससे मामला लंबा हो जाता है, लेकिन हमारा मैनेजर स्वचालित रूप से NFT गिफ्ट की मौजूदगी जांचता है, इसलिए सेवा को '
+                      'धोखा नहीं दिया जा सकता।\n'
+                      '\n'
+                      '• जमा कितनी जल्दी होता है? जमा भी आमतौर पर 2 मिनट से अधिक नहीं लेता।\n'
+                      '\n'
+                      '• मुझे एक जैसा बॉट दिखा, क्या मुझे उस पर भरोसा करना चाहिए? यदि आपको <a '
+                      'href="https://t.me/FunpayTrust_robot">@FunpayTrust_robot</a> के अलावा कोई अन्य बॉट दिखे, तो उसके साथ किसी भी हालत '
+                      'में डील न करें!'},
+ 'support_button': {'ru': 'Поддержка', 'en': 'Support', 'uk': 'Підтримка', 'kk': 'Қолдау', 'zh': '支持', 'hi': 'सहायता'},
+ 'support_text': {'ru': '🆘 Поддержка: <a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>',
+                  'en': '🆘 Support: <a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>',
+                  'uk': '🆘 Підтримка: <a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>',
+                  'kk': '🆘 Қолдау: <a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>',
+                  'zh': '🆘 支持：<a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>',
+                  'hi': '🆘 सहायता: <a href="https://t.me/FunPayHeIp">@GiftsForFunpay</a>'},
+ 'cancel_deal_button': {'ru': 'Отменить сделку',
+                        'en': 'Cancel',
+                        'uk': 'Скасувати угоду',
+                        'kk': 'Мәмілені болдырмау',
+                        'zh': '取消',
+                        'hi': 'रद्द करें'},
+ 'confirm_receipt_button': {'ru': 'Подтвердить участие',
+                            'en': 'Confirm',
+                            'uk': 'Підтвердити участь',
+                            'kk': 'Қатысуды растау',
+                            'zh': '确认',
+                            'hi': 'पुष्टि करें'},
+ 'item_delivered_button': {'ru': '✅ Участие подтверждено.',
+                           'en': '✅ Confirmed.',
+                           'uk': '✅ Участь підтверджено.',
+                           'kk': '✅ Расталды.',
+                           'zh': '✅ 已确认。',
+                           'hi': '✅ पुष्टि की गई।'},
+ 'policy_btn': {'ru': 'Политика конфиденциальности',
+                'en': 'Privacy Policy',
+                'uk': 'Політика конфіденційності',
+                'kk': 'Құпиялылық саясаты',
+                'zh': '隐私政策',
+                'hi': 'गोपनीयता नीति'},
+ 'accept_btn': {'ru': 'Принимаю', 'en': 'Accept', 'uk': 'Приймаю', 'kk': 'Қабылдаймын', 'zh': '接受', 'hi': 'स्वीकार करें'},
+ 'lang_changed': {'ru': '✅ Язык установлен: {lang}.',
+                  'en': '✅ Language set: {lang}.',
+                  'uk': '✅ Мову встановлено: {lang}.',
+                  'kk': '✅ Тіл орнатылды: {lang}.',
+                  'zh': '✅ 语言已设置: {lang}。',
+                  'hi': '✅ भाषा सेट की गई: {lang}।'},
+ 'my_deals': {'ru': 'Мои сделки', 'en': 'My deals', 'uk': 'Мої угоди', 'kk': 'Менің мәмілелерім', 'zh': '我的交易', 'hi': 'मेरे सौदे'},
+ 'req': {'ru': 'Реквизиты', 'en': 'Requisites', 'uk': 'Реквізити', 'kk': 'Реквизиттер', 'zh': '详情', 'hi': 'विवरण'},
+ 'referral': {'ru': '💠 РЕФЕРАЛЬНАЯ ПРОГРАММА\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 Ваша ссылка:\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 СТАТИСТИКА:\n'
+                    '\n'
+                    '• Всего приглашено: {total}\n'
+                    '• Активных рефералов: 0\n'
+                    '• Общий объем сделок: 0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 ВАШИ БОНУСЫ:\n'
+                    '\n'
+                    '• За каждого активного реферала: +5% к балансу\n'
+                    '• При первой сделке реферала: +100 ₽',
+              'en': '💠 REFERRAL PROGRAM\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 Your link:\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 STATISTICS:\n'
+                    '\n'
+                    '• Total invited: {total}\n'
+                    '• Active referrals: 0\n'
+                    '• Total deal volume: 0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 YOUR BONUSES:\n'
+                    '\n'
+                    '• For each active referral: +5% to balance\n'
+                    "• On referral's first deal: +100 ₽",
+              'uk': '💠 РЕФЕРАЛЬНА ПРОГРАМА\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 Ваше посилання:\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 СТАТИСТИКА:\n'
+                    '\n'
+                    '• Всього запрошено: {total}\n'
+                    '• Активних рефералів: 0\n'
+                    '• Загальний обсяг угод: 0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 ВАШІ БОНУСИ:\n'
+                    '\n'
+                    '• За кожного активного реферала: +5% до балансу\n'
+                    '• При першій угоді реферала: +100 ₽',
+              'kk': '💠 РЕФЕРАЛДЫҚ БАҒДАРЛАМА\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 Сіздің сілтемеңіз:\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 СТАТИСТИКА:\n'
+                    '\n'
+                    '• Барлығы шақырылған: {total}\n'
+                    '• Белсенді рефералдар: 0\n'
+                    '• Мәмілелердің жалпы көлемі: 0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 СІЗДІҢ БОНУСТАРЫҢЫЗ:\n'
+                    '\n'
+                    '• Әрбір белсенді реферал үшін: балансқа +5%\n'
+                    '• Рефералдың алғашқы мәмілесінде: +100 ₽',
+              'zh': '💠 推荐计划\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 您的链接：\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 统计：\n'
+                    '\n'
+                    '• 总邀请：{total}\n'
+                    '• 活跃推荐：0\n'
+                    '• 总交易额：0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 您的奖金：\n'
+                    '\n'
+                    '• 每个活跃推荐：+5% 余额\n'
+                    '• 推荐的首次交易：+100 ₽',
+              'hi': '💠 रेफरल कार्यक्रम\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '\n'
+                    '🔗 आपका लिंक:\n'
+                    '{link}\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '📊 आंकड़े:\n'
+                    '\n'
+                    '• कुल आमंत्रित: {total}\n'
+                    '• सक्रिय रेफरल: 0\n'
+                    '• कुल सौदा राशि: 0.00 ₽\n'
+                    '\n'
+                    '━━━━━━━━━━━━━━━━━━━\n'
+                    '💰 आपके बोनस:\n'
+                    '\n'
+                    '• प्रत्येक सक्रिय रेफरल के लिए: शेष में +5%\n'
+                    '• रेफरल के पहले सौदे पर: +100 ₽'},
+ 'profile': {'ru': 'Профиль', 'en': 'Profile', 'uk': 'Профіль', 'kk': 'Профиль', 'zh': '个人资料', 'hi': 'प्रोफ़ाइल'},
+ 'language': {'ru': 'Язык', 'en': 'Language', 'uk': 'Мова', 'kk': 'Тіл', 'zh': '语言', 'hi': 'भाषा'},
+ 'back': {'ru': 'Назад', 'en': 'Back', 'uk': 'Назад', 'kk': 'Артқа', 'zh': '返回', 'hi': 'वापस'},
+ 'create': {'ru': 'Создать Сделку', 'en': 'Create Deal', 'uk': 'Створити Угоду', 'kk': 'Мәміле жасау', 'zh': '创建交易', 'hi': 'सौदा बनाएं'},
+ 'seller': {'ru': 'Продавец', 'en': 'Seller', 'uk': 'Продавець', 'kk': 'Сатушы', 'zh': '卖家', 'hi': 'विक्रेता'},
+ 'buyer': {'ru': 'Покупатель', 'en': 'Buyer', 'uk': 'Покупець', 'kk': 'Сатып алушы', 'zh': '买家', 'hi': 'खरीदार'},
+ 'account': {'ru': 'Аккаунт/товар', 'en': 'Account/goods', 'uk': 'Аккаунт/товар', 'kk': 'Аккаунт/тауар', 'zh': '账户/商品', 'hi': 'खाता/माल'},
+ 'gift': {'ru': 'NFT Gift', 'en': 'NFT Gift', 'uk': 'NFT Gift', 'kk': 'NFT Сыйлық', 'zh': 'NFT礼物', 'hi': 'NFT उपहार'},
+ 'description_account': {'ru': '📝 Опишите предмет сделки',
+                         'en': '📝 Describe deal item',
+                         'uk': '📝 Опишіть предмет угоди',
+                         'kk': '📝 Мәміле пәнін сипаттаңыз',
+                         'zh': '📝 描述交易标的',
+                         'hi': '📝 सौदे के विषय का वर्णन करें'},
+ 'description_gift': {'ru': '🎁 Опишите предмет сделки\nПример: t.me/nft/DurovsCap-1',
+                      'en': '🎁 Describe the deal item\nExample: t.me/nft/DurovsCap-1',
+                      'uk': '🎁 Опишіть предмет угоди\nПриклад: t.me/nft/DurovsCap-1',
+                      'kk': '🎁 Мәміле пәнін сипаттаңыз\nМысал: t.me/nft/DurovsCap-1',
+                      'zh': '🎁 描述交易标的\n示例: t.me/nft/DurovsCap-1',
+                      'hi': '🎁 सौदे के विषय का वर्णन करें\nउदाहरण: t.me/nft/DurovsCap-1'},
+ 'currency': {'ru': '💱 Выберите валюту',
+              'en': '💱 Choose currency',
+              'uk': '💱 Виберіть валюту',
+              'kk': '💱 Валютаны таңдаңыз',
+              'zh': '💱 选择货币',
+              'hi': '💱 मुद्रा चुनें'},
+ 'amount': {'ru': '💰 Введите сумму',
+            'en': '💰 Enter amount',
+            'uk': '💰 Введіть суму',
+            'kk': '💰 Соманы енгізіңіз',
+            'zh': '💰 输入金额',
+            'hi': '💰 राशि दर्ज करें'},
+ 'requisites': {'ru': '💳 Введите реквизиты',
+                'en': '💳 Enter requisites',
+                'uk': '💳 Введіть реквізити',
+                'kk': '💳 Реквизиттерді енгізіңіз',
+                'zh': '💳 输入详情',
+                'hi': '💳 विवरण दर्ज करें'},
+ 'seller_username': {'ru': '👤 Введите @username продавца',
+                     'en': '👤 Enter seller @username',
+                     'uk': '👤 Введіть @username продавця',
+                     'kk': '👤 Сатушының @username енгізіңіз',
+                     'zh': '👤 输入卖家 @username',
+                     'hi': '👤 विक्रेता का @username दर्ज करें'},
+ 'deal_active': {'ru': 'Активна', 'en': 'Active', 'uk': 'Активна', 'kk': 'Белсенді', 'zh': '活跃', 'hi': 'सक्रिय'},
+ 'cancel_deal': {'ru': 'Отменить сделку',
+                 'en': 'Cancel',
+                 'uk': 'Скасувати угоду',
+                 'kk': 'Мәмілені болдырмау',
+                 'zh': '取消',
+                 'hi': 'रद्द करें'},
+ 'confirm': {'ru': 'Подтвердить участие',
+             'en': 'Confirm',
+             'uk': 'Підтвердити участь',
+             'kk': 'Қатысуды растау',
+             'zh': '确认',
+             'hi': 'पुष्टि करें'},
+ 'confirm_seller_notify': {'ru': '✅ Участие подтверждено.',
+                           'en': '✅ Confirmed.',
+                           'uk': '✅ Участь підтверджено.',
+                           'kk': '✅ Расталды.',
+                           'zh': '✅ 已确认。',
+                           'hi': '✅ पुष्टि की गई।'},
+ 'buyer_notify': {'ru': '✅ Продавец подтвердил сделку #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквизиты:\n{req}',
+                  'en': '✅ Seller confirmed deal #{deal_id}.\n\n💰 {amount} {currency}\n💳 Requisites:\n{req}',
+                  'uk': '✅ Продавець підтвердив угоду #{deal_id}.\n\n💰 {amount} {currency}\n💳 Реквізити:\n{req}',
+                  'kk': '✅ Сатушы #{deal_id} мәмілесін растады.\n\n💰 {amount} {currency}\n💳 Реквизиттер:\n{req}',
+                  'zh': '✅ 卖家已确认交易 #{deal_id}。\n\n💰 {amount} {currency}\n💳 详情:\n{req}',
+                  'hi': '✅ विक्रेता ने सौदा #{deal_id} की पुष्टि की।\n\n💰 {amount} {currency}\n💳 विवरण:\n{req}'},
+ 'confirmed': {'ru': '✅ Оплата подтверждена\n'
+                     '\n'
+                     '📌 Сделка: #{deal_id}\n'
+                     '👤 Продавец: @{seller}\n'
+                     '⭐ Рейтинг: {rating}/5\n'
+                     '✅ Успешно: {successful}\n'
+                     '💰 Сумма: {amount} {currency}\n'
+                     '📦 Предмет: {description}\n'
+                     '\n'
+                     '⏳ Ожидайте передачу.',
+               'en': '✅ Payment confirmed\n'
+                     '\n'
+                     '📌 Deal: #{deal_id}\n'
+                     '👤 Seller: @{seller}\n'
+                     '⭐ Rating: {rating}/5\n'
+                     '✅ Successful: {successful}\n'
+                     '💰 Amount: {amount} {currency}\n'
+                     '📦 Item: {description}\n'
+                     '\n'
+                     '⏳ Wait for transfer.',
+               'uk': '✅ Оплата підтверджена\n'
+                     '\n'
+                     '📌 Угода: #{deal_id}\n'
+                     '👤 Продавець: @{seller}\n'
+                     '⭐ Рейтинг: {rating}/5\n'
+                     '✅ Успішно: {successful}\n'
+                     '💰 Сума: {amount} {currency}\n'
+                     '📦 Предмет: {description}\n'
+                     '\n'
+                     '⏳ Очікуйте передачу.',
+               'kk': '✅ Төлем расталды\n'
+                     '\n'
+                     '📌 Мәміле: #{deal_id}\n'
+                     '👤 Сатушы: @{seller}\n'
+                     '⭐ Рейтинг: {rating}/5\n'
+                     '✅ Сәтті: {successful}\n'
+                     '💰 Сома: {amount} {currency}\n'
+                     '📦 Тауар: {description}\n'
+                     '\n'
+                     '⏳ Беруді күтіңіз.',
+               'zh': '✅ 付款已确认\n'
+                     '\n'
+                     '📌 交易: #{deal_id}\n'
+                     '👤 卖家: @{seller}\n'
+                     '⭐ 评分: {rating}/5\n'
+                     '✅ 成功: {successful}\n'
+                     '💰 金额: {amount} {currency}\n'
+                     '📦 商品: {description}\n'
+                     '\n'
+                     '⏳ 等待交付。',
+               'hi': '✅ भुगतान की पुष्टि की गई\n'
+                     '\n'
+                     '📌 सौदा: #{deal_id}\n'
+                     '👤 विक्रेता: @{seller}\n'
+                     '⭐ रेटिंग: {rating}/5\n'
+                     '✅ सफल: {successful}\n'
+                     '💰 राशि: {amount} {currency}\n'
+                     '📦 वस्तु: {description}\n'
+                     '\n'
+                     '⏳ हस्तांतरण की प्रतीक्षा करें।'},
+ 'req_menu': {'ru': '💳 Выберите валюту',
+              'en': '💳 Choose currency',
+              'uk': '💳 Виберіть валюту',
+              'kk': '💳 Валютаны таңдаңыз',
+              'zh': '💳 选择货币',
+              'hi': '💳 मुद्रा चुनें'},
+ 'active_limit': {'ru': '⚠️ Максимум 5 сделок.',
+                  'en': '⚠️ Max 5 deals.',
+                  'uk': '⚠️ Максимум 5 угод.',
+                  'kk': '⚠️ Максимум 5 мәміле.',
+                  'zh': '⚠️ 最多5笔交易。',
+                  'hi': '⚠️ अधिकतम 5 सौदे।'},
+ 'not_found': {'ru': '❌ Сделка не найдена.',
+               'en': '❌ Deal not found.',
+               'uk': '❌ Угоду не знайдено.',
+               'kk': '❌ Мәміле табылмады.',
+               'zh': '❌ 未找到交易。',
+               'hi': '❌ सौदा नहीं मिला।'},
+ 'not_allowed': {'ru': '⛔ Действие недоступно.',
+                 'en': '⛔ Not allowed.',
+                 'uk': '⛔ Дія недоступна.',
+                 'kk': '⛔ Қолжетімсіз.',
+                 'zh': '⛔ 不允许。',
+                 'hi': '⛔ अनुमति नहीं है।'},
+ 'invalid': {'ru': '❌ Некорректное значение.',
+             'en': '❌ Invalid value.',
+             'uk': '❌ Некоректне значення.',
+             'kk': '❌ Қате мән.',
+             'zh': '❌ 无效值。',
+             'hi': '❌ अमान्य मान।'},
+ 'cancelled': {'ru': '❌ Сделка #{deal_id} отменена.',
+               'en': '❌ Deal #{deal_id} cancelled.',
+               'uk': '❌ Угоду #{deal_id} скасовано.',
+               'kk': '❌ #{deal_id} мәмілесі болдырмалды.',
+               'zh': '❌ 交易 #{deal_id} 已取消。',
+               'hi': '❌ सौदा #{deal_id} रद्द कर दिया गया।'},
+ 'self_deal': {'ru': '❌ Нельзя занять вторую роль.',
+               'en': '❌ Cannot take second role.',
+               'uk': '❌ Не можна зайняти другу роль.',
+               'kk': '❌ Екінші рөлді ала алмайсыз.',
+               'zh': '❌ 不能担任第二角色。',
+               'hi': '❌ दूसरी भूमिका नहीं ले सकते।'},
+ 'full': {'ru': 'ℹ️ Обе роли заняты.',
+          'en': 'ℹ️ Both roles taken.',
+          'uk': 'ℹ️ Обидві ролі зайняті.',
+          'kk': 'ℹ️ Екі рөл де бос емес.',
+          'zh': 'ℹ️ 两个角色都已占用。',
+          'hi': 'ℹ️ दोनों भूमिकाएँ ली गई हैं।'},
+ 'already_member': {'ru': 'ℹ️ Вы уже участник.',
+                    'en': 'ℹ️ Already a member.',
+                    'uk': 'ℹ️ Ви вже учасник.',
+                    'kk': 'ℹ️ Сіз қатысушысыз.',
+                    'zh': 'ℹ️ 您已是参与者。',
+                    'hi': 'ℹ️ आप पहले से ही सदस्य हैं।'}}
+
+# Add all six dictionaries with the same complete key set.
+for _lang in ("uk", "kk", "zh", "hi"):
+    HTML_LOCALES[_lang] = dict(HTML_LOCALES["en"])
+
+for _lang in ('ru', 'en', 'uk', 'kk', 'zh', 'hi'):
+    for _key, _translations in _LEGACY_COMMON.items():
+        if _lang in _translations:
+            HTML_LOCALES[_lang][_key] = _translations[_lang]
+for _lang in HTML_LOCALES:
+    HTML_LOCALES[_lang]["welcome"] = _MAIN_WELCOME[_lang]
+    HTML_LOCALES[_lang].update(_LANG_LABELS[_lang])
+    if _lang in _NATIVE:
+        HTML_LOCALES[_lang].update(_NATIVE[_lang])
+
+# Make RU/EN language labels complete too.
+HTML_LOCALES["ru"].update(_LANG_LABELS["ru"])
+HTML_LOCALES["en"].update(_LANG_LABELS["en"])
+HTML_LOCALES["ru"]["welcome"] = _MAIN_WELCOME["ru"]
+HTML_LOCALES["en"]["welcome"] = _MAIN_WELCOME["en"]
+
+
 def get_html_text(key: str, lang: str, **kwargs) -> str:
     """Получить локализованный текст с HTML-разметкой."""
     lang_dict = HTML_LOCALES.get(lang, HTML_LOCALES["ru"])
