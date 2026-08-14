@@ -48,10 +48,6 @@ _E = {
     "warning":      '<tg-emoji emoji-id="5420323339723881652">⚠️</tg-emoji>',
     "sparkle":      '<tg-emoji emoji-id="5325547803936572038">✨</tg-emoji>',
     "flag_us":      '<tg-emoji emoji-id="5202021044105257611">🇺🇸</tg-emoji>',
-    "flag_hi_custom": '<tg-emoji emoji-id="5445209411029050250">🇮🇳</tg-emoji>',
-    "flag_kk_custom": '<tg-emoji emoji-id="5228885231318088701">🇰🇿</tg-emoji>',
-    "flag_zh_custom": '<tg-emoji emoji-id="5431782733376399004">🇨🇳</tg-emoji>',
-    "flag_uk_custom": '<tg-emoji emoji-id="5445118241758257251">🇺🇦</tg-emoji>',
     "globe2":       '<tg-emoji emoji-id="5447410659077661506">🌐</tg-emoji>',
     "gift":         '<tg-emoji emoji-id="6037175527846975726">🎁</tg-emoji>',
     "confetti":     '<tg-emoji emoji-id="5193018401810822951">🎉</tg-emoji>',
@@ -127,13 +123,15 @@ HTML_LOCALES = {
     "ru": {
         # ─── Главное меню ───────────────────────────────────────────────────────────
         "welcome": (
-            "<b>Добро пожаловать в Lolz | otc</b>\n\n"
-            "<blockquote><i>Ваш надёжный P2P-гарант:</i>\n"
-            "Автоматические сделки с NFT и подарками\n"
-            "Полная защита обеих сторон\n"
-            "Реферальная программа — 50% от комиссии\n"
-            "Передача товаров через менеджера: "
-            "<a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>"
+            f"{e['briefcase2']} <b>Добро пожаловать в {{service_name}}</b> {e['handshake']}\n\n"
+            f"<blockquote>"
+            f"{e['lightning']} <i>Ваш надёжный P2P-гарант:</i>\n"
+            f"{e['n1']} Автоматические сделки с NFT и подарками\n"
+            f"{e['n2']} {e['shield2']} Полная защита обеих сторон\n"
+            f"{e['n3']} {e['coin2']} Реферальная программа — 50% от комиссии\n"
+            f"{e['n4']} {e['package']} Передача товаров через менеджера: @{{manager_username}}"
+            f"</blockquote>\n\n"
+            f"{e['idea']} <b>Выберите действие ниже</b> {e['down']}"
         ),
 
         # ─── Реквизиты ──────────────────────────────────────────────────────────────
@@ -648,13 +646,15 @@ HTML_LOCALES = {
     # ════════════════════════════════════════════════════════════════════════════════
     "en": {
         "welcome": (
-            "<b>Welcome to Lolz | otc</b>\n\n"
-            "<blockquote><i>Your trusted P2P escrow:</i>\n"
-            "Automated NFT & gift deals\n"
-            "Full protection for both sides\n"
-            "Referral program — 50% of commission\n"
-            "Item handover via manager: "
-            "<a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>"
+            f"{e['briefcase2']} <b>Welcome to {{service_name}}</b> {e['handshake']}\n\n"
+            f"<blockquote>"
+            f"{e['lightning']} <i>Your trusted P2P escrow:</i>\n"
+            f"{e['n1']} Automated NFT & gift deals\n"
+            f"{e['n2']} {e['shield2']} Full security & refund guarantee\n"
+            f"{e['n3']} {e['coin2']} Referral program — 50% commission\n"
+            f"{e['n4']} {e['package']} Item handover via manager: @{{manager_username}}"
+            f"</blockquote>\n\n"
+            f"{e['idea']} <b>Choose an action below</b> {e['down']}"
         ),
 
         "my_credentials": (
@@ -1146,86 +1146,10 @@ HTML_LOCALES = {
 }
 
 
-# ─── Дополнительные языки ──────────────────────────────────────────────────────
-# Базой служит английская локаль; все основные экраны и кнопки переопределены
-# ниже на выбранном языке. Это позволяет не терять функциональность старых
-# разделов при добавлении новых языков.
-_COMMON_MENU = {
-    "ru": {
-        "welcome": "<b>Добро пожаловать в Lolz | otc</b>\n\n<blockquote><i>Ваш надёжный P2P-гарант:</i>\nАвтоматические сделки с NFT и подарками\nПолная защита обеих сторон\nРеферальная программа — 50% от комиссии\nПередача товаров через менеджера: <a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"Мои реквизиты","menu_create_deal":"Создать сделку","menu_balance":"Баланс","menu_my_deals":"Мои сделки","menu_referral":"Рефералы","lang_button":"Язык",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी",
-        "back_to_menu":"Назад в меню","back_button":"Назад","copy_ref_link_button":"Скопировать реф. ссылку","role_seller_button":"Продавец","role_buyer_button":"Покупатель",
-        "withdraw_button":"Вывести средства","withdraw_confirm_button":"Подтвердить вывод","my_deals_search_button":"Поиск","my_deals_back_button":"Назад",
-        "send_item_button":"Передать товар менеджеру","item_delivered_button":"Готово — передано","confirm_receipt_button":"Подтвердить получение","cancel_deal_button":"Отменить сделку",
-        "pay_from_balance_button":"Оплатить с баланса","pay_from_balance_confirm_button":"Подтвердить оплату","pay_from_balance_cancel_button":"← Назад к сделке",
-        "transactions_button":"Транзакции","transactions_back_button":"← Назад к балансу",
-    },
-    "en": {
-        "welcome": "<b>Welcome to Lolz | otc</b>\n\n<blockquote><i>Your trusted P2P escrow:</i>\nAutomated NFT & gift deals\nFull protection for both sides\nReferral program — 50% of commission\nItem handover via manager: <a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"My Credentials","menu_create_deal":"Create Deal","menu_balance":"Balance","menu_my_deals":"My Deals","menu_referral":"Referrals","lang_button":"Language",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी",
-        "back_to_menu":"Back to menu","back_button":"Back","copy_ref_link_button":"Copy referral link","role_seller_button":"Seller","role_buyer_button":"Buyer",
-        "withdraw_button":"Withdraw funds","withdraw_confirm_button":"Confirm withdrawal","my_deals_search_button":"Search","my_deals_back_button":"Back",
-        "send_item_button":"Send item to manager","item_delivered_button":"Done — delivered","confirm_receipt_button":"Confirm receipt","cancel_deal_button":"Cancel deal",
-        "pay_from_balance_button":"Pay from balance","pay_from_balance_confirm_button":"Confirm payment","pay_from_balance_cancel_button":"← Back to deal",
-        "transactions_button":"Transactions","transactions_back_button":"← Back to balance",
-    },
-    "uk": {
-        "welcome":"<b>Ласкаво просимо до Lolz | otc</b>\n\n<blockquote><i>Ваш надійний P2P-гарант:</i>\nАвтоматичні угоди з NFT та подарунками\nПовний захист обох сторін\nРеферальна програма — 50% від комісії\nПередача товарів через менеджера: <a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"Мої реквізити","menu_create_deal":"Створити угоду","menu_balance":"Баланс","menu_my_deals":"Мої угоди","menu_referral":"Реферали","lang_button":"Мова",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हінді",
-        "back_to_menu":"Назад до меню","back_button":"Назад","copy_ref_link_button":"Скопіювати реф. посилання","role_seller_button":"Продавець","role_buyer_button":"Покупець",
-        "withdraw_button":"Вивести кошти","withdraw_confirm_button":"Підтвердити виведення","my_deals_search_button":"Пошук","my_deals_back_button":"Назад",
-        "send_item_button":"Передати товар менеджеру","item_delivered_button":"Готово — передано","confirm_receipt_button":"Підтвердити отримання","cancel_deal_button":"Скасувати угоду",
-        "pay_from_balance_button":"Оплатити з балансу","pay_from_balance_confirm_button":"Підтвердити оплату","pay_from_balance_cancel_button":"← Назад до угоди",
-        "transactions_button":"Транзакції","transactions_back_button":"← Назад до балансу",
-    },
-    "kk": {
-        "welcome":"<b>Lolz | otc сайтына қош келдіңіз</b>\n\n<blockquote><i>Сіздің сенімді P2P-кепілгеріңіз:</i>\nNFT және сыйлықтармен автоматты мәмілелер\nЕкі тараптың толық қорғанысы\nРефералдық бағдарлама — комиссияның 50%-ы\nТауарларды менеджер арқылы беру: <a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"Менің реквизиттерім","menu_create_deal":"Мәміле жасау","menu_balance":"Баланс","menu_my_deals":"Менің мәмілелерім","menu_referral":"Рефералдар","lang_button":"Тіл",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हинди",
-        "back_to_menu":"Мәзірге оралу","back_button":"Артқа","copy_ref_link_button":"Реферал сілтемесін көшіру","role_seller_button":"Сатушы","role_buyer_button":"Сатып алушы",
-        "withdraw_button":"Қаражатты шығару","withdraw_confirm_button":"Шығаруды растау","my_deals_search_button":"Іздеу","my_deals_back_button":"Артқа",
-        "send_item_button":"Тауарды менеджерге жіберу","item_delivered_button":"Дайын — берілді","confirm_receipt_button":"Алуды растау","cancel_deal_button":"Мәмілені болдырмау",
-        "pay_from_balance_button":"Баланс арқылы төлеу","pay_from_balance_confirm_button":"Төлемді растау","pay_from_balance_cancel_button":"← Мәмілеге оралу",
-        "transactions_button":"Транзакциялар","transactions_back_button":"← Балансқа оралу",
-    },
-    "zh": {
-        "welcome":"<b>欢迎来到 Lolz | otc</b>\n\n<blockquote><i>您可靠的 P2P 担保服务：</i>\nNFT 和礼物自动交易\n全面保护交易双方\n推荐计划 — 获得 50% 的手续费\n通过管理员交接商品：<a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"我的收款信息","menu_create_deal":"创建交易","menu_balance":"余额","menu_my_deals":"我的交易","menu_referral":"推荐","lang_button":"语言",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"印地语",
-        "back_to_menu":"返回菜单","back_button":"返回","copy_ref_link_button":"复制推荐链接","role_seller_button":"卖家","role_buyer_button":"买家",
-        "withdraw_button":"提现","withdraw_confirm_button":"确认提现","my_deals_search_button":"搜索","my_deals_back_button":"返回",
-        "send_item_button":"将商品交给管理员","item_delivered_button":"已完成 — 已交付","confirm_receipt_button":"确认收货","cancel_deal_button":"取消交易",
-        "pay_from_balance_button":"使用余额支付","pay_from_balance_confirm_button":"确认支付","pay_from_balance_cancel_button":"← 返回交易",
-        "transactions_button":"交易记录","transactions_back_button":"← 返回余额",
-    },
-    "hi": {
-        "welcome":"<b>Lolz | otc में आपका स्वागत है</b>\n\n<blockquote><i>आपका भरोसेमंद P2P एस्क्रो:</i>\nNFT और उपहारों के लिए स्वचालित सौदे\nदोनों पक्षों की पूर्ण सुरक्षा\nरेफरल प्रोग्राम — कमीशन का 50%\nमैनेजर के माध्यम से आइटम ट्रांसफर: <a href=\"https://t.me/LOLZotc_sapport\">@LolzSteamSupport</a></blockquote>",
-        "menu_credentials":"मेरे विवरण","menu_create_deal":"डील बनाएं","menu_balance":"बैलेंस","menu_my_deals":"मेरी डील्स","menu_referral":"रेफरल","lang_button":"भाषा",
-        "language_russian":"Русский","language_english":"English","language_ukrainian":"Українська","language_kazakh":"Қазақша","language_chinese":"中文","language_hindi":"हिन्दी",
-        "back_to_menu":"मेनू पर वापस","back_button":"वापस","copy_ref_link_button":"रेफरल लिंक कॉपी करें","role_seller_button":"विक्रेता","role_buyer_button":"खरीदार",
-        "withdraw_button":"राशि निकालें","withdraw_confirm_button":"निकासी की पुष्टि करें","my_deals_search_button":"खोजें","my_deals_back_button":"वापस",
-        "send_item_button":"आइटम मैनेजर को भेजें","item_delivered_button":"हो गया — भेज दिया","confirm_receipt_button":"प्राप्ति की पुष्टि करें","cancel_deal_button":"डील रद्द करें",
-        "pay_from_balance_button":"बैलेंस से भुगतान करें","pay_from_balance_confirm_button":"भुगतान की पुष्टि करें","pay_from_balance_cancel_button":"← डील पर वापस",
-        "transactions_button":"लेनदेन","transactions_back_button":"← बैलेंस पर वापस",
-    },
-}
-for _lang, _overrides in _COMMON_MENU.items():
-    if _lang not in HTML_LOCALES:
-        HTML_LOCALES[_lang] = dict(HTML_LOCALES["en"])
-    HTML_LOCALES[_lang].update(_overrides)
-
-
 def get_html_text(key: str, lang: str, **kwargs) -> str:
     """Получить локализованный текст с HTML-разметкой."""
-    lang = lang if lang in HTML_LOCALES else "ru"
-    lang_dict = HTML_LOCALES[lang]
-    text = lang_dict.get(key)
-    if text is None:
-        # Не подставляем английский только потому, что выбран другой язык.
-        text = HTML_LOCALES["ru"].get(key, HTML_LOCALES["en"].get(key, key))
+    lang_dict = HTML_LOCALES.get(lang, HTML_LOCALES["ru"])
+    text = lang_dict.get(key, HTML_LOCALES["ru"].get(key, key))
     if not text:
         return key
     try:
