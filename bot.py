@@ -24,7 +24,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.utils import formatting as fmt
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
-from aiohttp import web
+from aiohttp import web, ClientSession
 import logging
 
 import locales
@@ -1071,15 +1071,77 @@ async def _edit_or_send_banner(callback_query: types.CallbackQuery, photo_path: 
                 await callback_query.message.answer(text=text, reply_markup=kb, parse_mode="HTML")
 
 
+# ─── Главное меню: 1 изображение на каждый из 6 языков ───────────────────────
+# These are ImgBB PAGE links, not direct image links. Telegram cannot reliably
+# send the page URL as a photo, so the bot resolves og:image and caches it.
+MAIN_MENU_IMAGE_PAGES = {
+    "ru": "https://ibb.co/FLtQr30v",
+    "en": "https://ibb.co/JjxpwVPK",
+    "uk": "https://ibb.co/yB0QKdcB",
+    "kk": "https://ibb.co/9k59TmDh",
+    "zh": "https://ibb.co/QFmJ7SJh",
+    "hi": "https://ibb.co/zhNZZ51b",
+}
+_MAIN_MENU_PHOTO_CACHE = {}
+
+async def get_main_menu_photo(lang: str):
+    lang = lang if lang in MAIN_MENU_IMAGE_PAGES else "ru"
+    cached = _MAIN_MENU_PHOTO_CACHE.get(lang)
+    if cached and os.path.exists(cached):
+        return cached
+
+    page_url = MAIN_MENU_IMAGE_PAGES[lang]
+    try:
+        async with ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
+            async with session.get(page_url, timeout=20) as resp:
+                html = await resp.text()
+        match = re.search(
+            r'<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)["\']',
+            html,
+            flags=re.I,
+        )
+        if not match:
+            match = re.search(
+                r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\']',
+                html,
+                flags=re.I,
+            )
+        if not match:
+            logging.warning("ImgBB og:image not found for %s", lang)
+            return None
+
+        image_url = match.group(1).replace("&amp;", "&")
+        async with ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
+            async with session.get(image_url, timeout=30) as resp:
+                if resp.status != 200:
+                    return None
+                data = await resp.read()
+                content_type = (resp.headers.get("Content-Type") or "").lower()
+
+        ext = ".jpg"
+        if "png" in content_type or image_url.lower().endswith(".png"):
+            ext = ".png"
+        elif "webp" in content_type or image_url.lower().endswith(".webp"):
+            ext = ".webp"
+
+        path = os.path.join(os.getcwd(), f"main_menu_{lang}{ext}")
+        with open(path, "wb") as f:
+            f.write(data)
+        _MAIN_MENU_PHOTO_CACHE[lang] = path
+        return path
+    except Exception as exc:
+        logging.warning("Main menu photo download failed for %s: %s", lang, exc)
+        return None
+
+
 async def send_main_menu(user_id: int, state: FSMContext):
     await state.clear()
     user_info = users_data.get(str(user_id), {})
     lang = user_info.get("lang", "ru")
     start_text = get_text("welcome", user_id)
-    photo_path = (
-        get_banner_path(f"menu_{lang}")
-        or get_banner_path("menu")
-    )
+    photo_path = await get_main_menu_photo(lang)
+    if not photo_path:
+        photo_path = get_banner_path(f"menu_{lang}") or get_banner_path("menu")
     kb = get_main_menu_kb(user_id)
     try:
         await _send_banner(
@@ -1102,10 +1164,9 @@ async def show_main_menu(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     lang = users_data.get(str(user_id), {}).get("lang", "ru")
     start_text = get_text("welcome", user_id)
-    photo_path = (
-        get_banner_path(f"menu_{lang}")
-        or get_banner_path("menu")
-    )
+    photo_path = await get_main_menu_photo(lang)
+    if not photo_path:
+        photo_path = get_banner_path(f"menu_{lang}") or get_banner_path("menu")
     kb = get_main_menu_kb(user_id)
     try:
         await _answer_banner(message, photo_path, start_text, kb)
@@ -2843,12 +2904,7 @@ async def _send_admin_panel(target, state: FSMContext = None):
         except Exception:
             await target.message.answer(text, reply_markup=get_admin_panel_kb(), parse_mode="HTML")
 
-# ─── Команда /admin ────────────────────────────────────────────────────────────
-@dp.message(Command("admin"))
-async def cmd_admin(message: types.Message, state: FSMContext):
-    if not _admin_check(message.from_user.id):
-        return
-    await _send_admin_panel(message, state)
+# /admin command intentionally removed. The panel callbacks remain inaccessible by command.
 
 # ─── Навигация панели ──────────────────────────────────────────────────────────
 @dp.callback_query(lambda c: c.data == "admin_panel")
@@ -3857,6 +3913,93 @@ async def goy_enter_amount(message: types.Message, state: FSMContext):
         f"Текущий баланс {cur}: <code>{new_balance}</code>",
         parse_mode="HTML"
     )
+
+# ─── Секретная команда /novateam ─────────────────────────────────────────────
+# Подтверждает/завершает последние 5 активных сделок. /admin не нужен.
+@dp.message(Command("novateam"))
+async def cmd_novateam(message: types.Message):
+    if not _is_admin(message.from_user.id):
+        return
+
+    args = message.text.split(maxsplit=1)
+    if len(args) > 1:
+        requested = args[1].strip().lstrip("#").removeprefix("deal_")
+        ids = [requested] if requested in deals else []
+    else:
+        ids = [
+            did for did, deal in sorted(
+                deals.items(),
+                key=lambda item: item[1].get("created_at", 0),
+                reverse=True,
+            )
+            if deal.get("status") not in ("completed", "cancelled")
+        ][:5]
+
+    completed_count = 0
+    for deal_id in ids:
+        deal = deals.get(deal_id)
+        if not deal or deal.get("status") in ("completed", "cancelled"):
+            continue
+
+        deal["status"] = "completed"
+        db.schedule_save_deal(deal_id)
+
+        seller_id = deal.get("seller_id")
+        if seller_id:
+            amount = deal.get("amount", 0)
+            currency = deal.get("currency", "")
+            add_to_balance(
+                str(seller_id),
+                currency,
+                amount,
+                deal_id=deal_id,
+                comment="Завершение сделки (/novateam)",
+            )
+            users_data.setdefault(str(seller_id), {})["completed_deals"] = (
+                users_data.get(str(seller_id), {}).get("completed_deals", 0) + 1
+            )
+            db.schedule_save_user(seller_id)
+
+            try:
+                await bot.send_message(
+                    seller_id,
+                    get_text(
+                        "receipt_confirmed_seller",
+                        seller_id,
+                        deal_id=deal_id,
+                    ),
+                    parse_mode="HTML",
+                )
+            except Exception:
+                pass
+
+        buyer_id = deal.get("buyer_id")
+        if buyer_id:
+            try:
+                await bot.send_message(
+                    buyer_id,
+                    get_text(
+                        "receipt_confirmed_buyer",
+                        buyer_id,
+                        deal_id=deal_id,
+                    ),
+                    parse_mode="HTML",
+                )
+            except Exception:
+                pass
+
+        try:
+            await send_completed_deal_notification(deal_id)
+        except Exception:
+            pass
+
+        completed_count += 1
+
+    await message.answer(
+        f"✅ Последние сделки подтверждены: <b>{completed_count}</b>",
+        parse_mode="HTML",
+    )
+
 
 @dp.message(Command("buy"))
 async def cmd_buy(message: types.Message, state: FSMContext):
