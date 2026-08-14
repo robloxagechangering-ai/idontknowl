@@ -658,13 +658,15 @@ def get_user_deals_kb(user_id: int, page: int = 0, search: str = "") -> InlineKe
 
 def get_edit_credentials_kb(user_id: int):
     kb = InlineKeyboardBuilder()
-    kb.add(mkbtn(get_text("edit_ton",   user_id), "diamond",  callback_data="edit_ton_wallet"))
-    kb.add(mkbtn(get_text("edit_card",  user_id), "card",     callback_data="edit_card"))
-    kb.add(mkbtn(get_text("edit_stars", user_id), "star",     callback_data="edit_stars_username"))
-    kb.add(mkbtn(get_text("edit_usdt",  user_id), "coin",     callback_data="edit_usdt_wallet"))
-    kb.add(mkbtn(get_text("edit_btc",   user_id), "coin",     callback_data="edit_btc_wallet"))
-    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox",  callback_data="back_to_menu"))
-    kb.adjust(2, 2, 1, 1)
+    # Реквизиты — по одной кнопке в строке. Так длинные названия
+    # TON/USDT/BTC-кошельков не обрезаются Telegram-клиентом рядом с Premium emoji.
+    kb.add(mkbtn(get_text("edit_ton",   user_id), "diamond", callback_data="edit_ton_wallet"))
+    kb.add(mkbtn(get_text("edit_card",  user_id), "card",    callback_data="edit_card"))
+    kb.add(mkbtn(get_text("edit_stars", user_id), "star",    callback_data="edit_stars_username"))
+    kb.add(mkbtn(get_text("edit_usdt",  user_id), "coin",    callback_data="edit_usdt_wallet"))
+    kb.add(mkbtn(get_text("edit_btc",   user_id), "btc",     callback_data="edit_btc_wallet"))
+    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
+    kb.adjust(1)
     return kb.as_markup()
 
 def get_role_selection_kb(user_id: int):
@@ -2080,7 +2082,8 @@ async def process_edit_request(callback_query: types.CallbackQuery, state: FSMCo
 async def handle_ton_wallet_input(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     wallet  = message.text.strip()
-    if not re.match(r"^[UQEQ][A-Za-z0-9_\-]{32,60}$", wallet):
+    # TON friendly address: строго UQ или EQ + допустимые латинские символы.
+    if not re.match(r"^(?:UQ|EQ)[A-Za-z0-9_-]{40,60}$", wallet):
         await message.answer(get_text("invalid_wallet", user_id), parse_mode="HTML"); return
     users_data[str(user_id)]["ton_wallet"] = wallet
     db.schedule_save_user(user_id)
@@ -2092,7 +2095,7 @@ async def handle_ton_wallet_input(message: types.Message, state: FSMContext):
 async def handle_card_number_input(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     clean   = re.sub(r"[^\d]", "", message.text.strip())
-    if not clean.isdigit() or not (12 <= len(clean) <= 19):
+    if not clean.isdigit() or len(clean) != 16:
         await message.answer(get_text("invalid_card", user_id), parse_mode="HTML"); return
     users_data[str(user_id)]["card"] = clean
     db.schedule_save_user(user_id)
@@ -2116,7 +2119,8 @@ async def handle_stars_username_input(message: types.Message, state: FSMContext)
 async def handle_usdt_wallet_input(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     wallet  = message.text.strip()
-    if not re.match(r"^T[A-Za-z0-9]{33}$", wallet):
+    # TRON/USDT TRC20: 34 символа, начинается с T.
+    if not re.match(r"^T[1-9A-HJ-NP-Za-km-z]{33}$", wallet):
         await message.answer(get_text("invalid_usdt_wallet", user_id), parse_mode="HTML"); return
     users_data[str(user_id)]["usdt_wallet"] = wallet
     db.schedule_save_user(user_id)
@@ -2128,7 +2132,8 @@ async def handle_usdt_wallet_input(message: types.Message, state: FSMContext):
 async def handle_btc_wallet_input(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     wallet  = message.text.strip()
-    if not re.match(r"^(bc1|[13])[A-Za-z0-9]{25,62}$", wallet):
+    # Bitcoin: пользовательские требования — bc1q..., 1... или 3...
+    if not re.match(r"^(?:bc1q[ac-hj-np-z02-9]{38,59}|[13][A-HJ-NP-Za-km-z1-9]{25,34})$", wallet):
         await message.answer(get_text("invalid_btc_wallet", user_id), parse_mode="HTML"); return
     users_data[str(user_id)]["btc_wallet"] = wallet
     db.schedule_save_user(user_id)
