@@ -1709,6 +1709,7 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
     await state.clear()
     action  = callback_query.data.split("_", 1)[1]
     user_id = callback_query.from_user.id
+    await callback_query.answer()
     lang    = users_data.get(str(user_id), {}).get("lang", "ru")
 
     async def edit_cap(text, kb):
@@ -1811,30 +1812,42 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
         kb.row(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
         await edit_cap(text, kb.as_markup())
 
-    await callback_query.answer()
 
 
 # ─── Выбор роли при создании сделки ───────────────────────────────────────────
 @dp.callback_query(lambda c: c.data in ("role_seller", "role_buyer"))
 async def process_role_selection(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     role = "seller" if callback_query.data == "role_seller" else "buyer"
     await state.update_data(creator_role=role)
     await state.set_state(CreateDealStates.choose_payment_method)
     text = get_text("choose_payment_method" if role == "seller" else "choose_payment_method_buyer", user_id)
     try:
-        await callback_query.message.edit_caption(caption=text, reply_markup=get_payment_method_kb(user_id), parse_mode="HTML")
-    except TelegramBadRequest as e:
-        if "no caption" in str(e).lower():
-            await callback_query.message.answer(text=text, reply_markup=get_payment_method_kb(user_id), parse_mode="HTML")
-        else:
-            raise
-    await callback_query.answer()
+        await callback_query.message.edit_caption(
+            caption=text,
+            reply_markup=get_payment_method_kb(user_id),
+            parse_mode="HTML",
+        )
+    except Exception:
+        try:
+            await callback_query.message.edit_text(
+                text=text,
+                reply_markup=get_payment_method_kb(user_id),
+                parse_mode="HTML",
+            )
+        except Exception:
+            await callback_query.message.answer(
+                text=text,
+                reply_markup=get_payment_method_kb(user_id),
+                parse_mode="HTML",
+            )
 
 
 # ─── Методы оплаты ────────────────────────────────────────────────────────────
 @dp.callback_query(lambda c: c.data == "payment_method_stars")
 async def process_payment_method_stars(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     stars_un = users_data.get(str(user_id), {}).get("stars_username", "").strip()
     if not stars_un:
@@ -1847,7 +1860,7 @@ async def process_payment_method_stars(callback_query: types.CallbackQuery, stat
             await callback_query.message.edit_caption(caption=text, reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(text=text, reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
 
     await state.update_data(payment_method="STARS", currency="STARS")
     await state.set_state(CreateDealStates.enter_amount)
@@ -1857,44 +1870,44 @@ async def process_payment_method_stars(callback_query: types.CallbackQuery, stat
     except Exception:
         await callback_query.message.answer(get_text("enter_stars_amount", user_id),
                                             reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
-    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data == "payment_method_ton")
 async def process_payment_method_ton(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     if not users_data.get(str(user_id), {}).get("ton_wallet"):
         try:
             await callback_query.message.edit_caption(caption=get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
     await state.update_data(payment_method="TON")
     await state.set_state(CreateDealStates.enter_amount)
     try:
         await callback_query.message.edit_caption(caption=get_text("enter_ton_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(get_text("enter_ton_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
-    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data == "payment_method_card")
 async def process_payment_method_card(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     if not users_data.get(str(user_id), {}).get("card"):
         try:
             await callback_query.message.edit_caption(caption=get_text("add_card_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(get_text("add_card_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
     await state.update_data(payment_method="CARD")
     await state.set_state(CreateDealStates.choose_currency)
     try:
         await callback_query.message.edit_caption(caption=get_text("enter_card_currency", user_id), reply_markup=get_currency_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(get_text("enter_card_currency", user_id), reply_markup=get_currency_kb(user_id), parse_mode="HTML")
-    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data == "payment_method_crypto")
 async def process_payment_method_crypto(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.answer()
     user_id = callback_query.from_user.id
     await state.update_data(payment_method="CRYPTO")
     await state.set_state(CreateDealStates.choose_crypto)
@@ -1902,30 +1915,30 @@ async def process_payment_method_crypto(callback_query: types.CallbackQuery, sta
         await callback_query.message.edit_caption(caption=get_text("choose_crypto", user_id), reply_markup=get_crypto_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(get_text("choose_crypto", user_id), reply_markup=get_crypto_kb(user_id), parse_mode="HTML")
-    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data.startswith("crypto_"))
 async def process_crypto_selection(callback_query: types.CallbackQuery, state: FSMContext):
     coin    = callback_query.data.split("_", 1)[1]
     user_id = callback_query.from_user.id
+    await callback_query.answer()
     if coin == "TON" and not users_data.get(str(user_id), {}).get("ton_wallet"):
         try:
             await callback_query.message.edit_caption(caption=get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
     if coin == "USDT" and not users_data.get(str(user_id), {}).get("usdt_wallet"):
         try:
             await callback_query.message.edit_caption(caption=get_text("add_usdt_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(get_text("add_usdt_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
     if coin == "BTC" and not users_data.get(str(user_id), {}).get("btc_wallet"):
         try:
             await callback_query.message.edit_caption(caption=get_text("add_btc_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
         except Exception:
             await callback_query.message.answer(get_text("add_btc_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        await callback_query.answer(); return
+        return
     await state.update_data(payment_method="CRYPTO", currency=coin)
     await state.set_state(CreateDealStates.enter_amount)
     key_map = {"TON": "enter_crypto_amount_ton", "USDT": "enter_crypto_amount_usdt", "BTC": "enter_crypto_amount_btc"}
@@ -1934,7 +1947,6 @@ async def process_crypto_selection(callback_query: types.CallbackQuery, state: F
         await callback_query.message.edit_caption(caption=text, reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(text, reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
-    await callback_query.answer()
 
 @dp.callback_query(lambda c: c.data.startswith("currency_"))
 async def process_currency(callback_query: types.CallbackQuery, state: FSMContext):
