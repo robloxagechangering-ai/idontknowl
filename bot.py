@@ -551,8 +551,35 @@ def _status_localized(status: str, user_id: int) -> str:
         "cancelled":                  "Cancelled",
     }
     lang = users_data.get(str(user_id), {}).get("lang", "ru")
-    m = en if lang == "en" else ru
-    return m.get(status, status)
+    status_map = {
+        "ru": ru,
+        "en": en,
+        "uk": {
+            "waiting_for_buyer": "Очікує покупця", "waiting_for_seller": "Очікує продавця",
+            "waiting_for_payment": "Очікує оплати", "payment_confirmed_by_admin": "Оплату підтверджено",
+            "item_delivered_to_manager": "Товар передано", "waiting_for_feedback": "Очікує відгуку",
+            "completed": "Завершена", "cancelled": "Скасована",
+        },
+        "kk": {
+            "waiting_for_buyer": "Сатып алушыны күтуде", "waiting_for_seller": "Сатушыны күтуде",
+            "waiting_for_payment": "Төлемді күтуде", "payment_confirmed_by_admin": "Төлем расталды",
+            "item_delivered_to_manager": "Тауар берілді", "waiting_for_feedback": "Пікірді күтуде",
+            "completed": "Аяқталды", "cancelled": "Болдырылмады",
+        },
+        "zh": {
+            "waiting_for_buyer": "等待买家", "waiting_for_seller": "等待卖家",
+            "waiting_for_payment": "等待付款", "payment_confirmed_by_admin": "付款已确认",
+            "item_delivered_to_manager": "商品已交付", "waiting_for_feedback": "等待评价",
+            "completed": "已完成", "cancelled": "已取消",
+        },
+        "hi": {
+            "waiting_for_buyer": "खरीदार की प्रतीक्षा", "waiting_for_seller": "विक्रेता की प्रतीक्षा",
+            "waiting_for_payment": "भुगतान की प्रतीक्षा", "payment_confirmed_by_admin": "भुगतान की पुष्टि",
+            "item_delivered_to_manager": "आइटम सौंप दिया गया", "waiting_for_feedback": "समीक्षा की प्रतीक्षा",
+            "completed": "पूरा हुआ", "cancelled": "रद्द किया गया",
+        },
+    }
+    return status_map.get(lang, en).get(status, status)
 
 def get_active_deals() -> dict:
     """Вернуть незавершённые сделки."""
@@ -1646,9 +1673,11 @@ async def menu_language(callback_query: types.CallbackQuery):
 async def set_language(callback_query: types.CallbackQuery, state: FSMContext):
     user_id = callback_query.from_user.id
     lang = callback_query.data.split("_", 2)[2]
-    users_data[str(user_id)]["lang"] = lang
+    if lang not in ("ru", "en", "uk", "kk", "zh", "hi"):
+        lang = "ru"
+    users_data.setdefault(str(user_id), {})["lang"] = lang
     db.schedule_save_user(user_id)
-    await callback_query.answer(get_alert("lang_changed", lang=lang))
+    await callback_query.answer(get_alert("lang_changed", user_id=user_id, lang=lang))
     try:
         await callback_query.message.delete()
     except Exception:
@@ -2789,7 +2818,7 @@ async def cancel_deal(callback_query: types.CallbackQuery, state: FSMContext):
                 user_deal_id = did
                 break
     if not user_deal_id:
-        await callback_query.answer("❌ Активная сделка не найдена", show_alert=True)
+        await callback_query.answer(get_alert("active_deal_not_found", user_id=user_id), show_alert=True)
         return
     # Проверяем — только создатель может отменить (до подключения партнёра)
     deal = deals[user_deal_id]
@@ -2797,19 +2826,15 @@ async def cancel_deal(callback_query: types.CallbackQuery, state: FSMContext):
     is_creator = (creator_role == "seller" and deal.get("seller_id") == user_id) or \
                  (creator_role == "buyer" and deal.get("buyer_id") == user_id)
     if not is_creator:
-        await callback_query.answer(
-            "❌ Отменить сделку может только её создатель" if lang == "ru" else "❌ Only the deal creator can cancel it",
-            show_alert=True
-        )
+        await callback_query.answer(get_alert("only_creator_can_cancel", user_id=user_id), show_alert=True)
         return
     # Запрос подтверждения
     kb = InlineKeyboardBuilder()
-    kb.add(mkbtn("Да, отменить", callback_data=f"cancel_deal_confirm_{user_deal_id}"))
-    kb.add(mkbtn("Нет, оставить", callback_data="back_to_menu"))
+    kb.add(mkbtn(get_text("cancel_confirm_yes", user_id), callback_data=f"cancel_deal_confirm_{user_deal_id}"))
+    kb.add(mkbtn(get_text("cancel_confirm_no", user_id), callback_data="back_to_menu"))
     kb.adjust(1)
     await callback_query.message.answer(
-        f"{e['warning']} <b>Вы уверены, что хотите отменить сделку <code>#{user_deal_id}</code>?</b>\n\n"
-        f"<i>Это действие необратимо.</i>",
+        get_text("cancel_confirm_text", user_id, deal_id=user_deal_id),
         reply_markup=kb.as_markup(),
         parse_mode="HTML"
     )
