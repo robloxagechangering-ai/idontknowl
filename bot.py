@@ -1039,68 +1039,87 @@ async def ensure_user(user_id: int, username: str):
 
 
 # ─── Отправка главного меню ────────────────────────────────────────────────────
+def _html_payload(html: str) -> tuple[str, list]:
+    """Convert our HTML/custom-emoji markup to Bot API text + entities.
+
+    This is intentionally used for menu/banner messages instead of parse_mode=HTML.
+    It makes <tg-emoji> and <blockquote> render identically for all six locales,
+    including photo/video captions where Telegram clients can otherwise fall back
+    to the plain Unicode emoji.
+    """
+    try:
+        return html_to_entities(html)
+    except Exception:
+        # Safe fallback: preserve the visible text if entity conversion ever fails.
+        import re as _re
+        plain = _re.sub(r'<tg-emoji[^>]*>(.*?)</tg-emoji>', r'\1', html, flags=_re.DOTALL)
+        plain = _re.sub(r'</?(?:b|strong|i|em|u|s|del|code|pre|blockquote)[^>]*>', '', plain, flags=_re.I)
+        return plain, []
+
 async def _send_menu_media(chat_id: int, photo_path: str, caption: str, kb):
-    """Отправить баннер главного меню с учётом формата файла."""
+    """Отправить баннер главного меню с Premium-эмодзи и blockquote."""
     ext = os.path.splitext(photo_path)[1].lower()
     f = FSInputFile(photo_path)
+    text, entities = _html_payload(caption)
     if ext == ".mp4":
-        await bot.send_video(chat_id=chat_id, video=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await bot.send_video(chat_id=chat_id, video=f, caption=text, caption_entities=entities, reply_markup=kb)
     elif ext == ".gif":
-        await bot.send_animation(chat_id=chat_id, animation=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await bot.send_animation(chat_id=chat_id, animation=f, caption=text, caption_entities=entities, reply_markup=kb)
     else:
-        await bot.send_photo(chat_id=chat_id, photo=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await bot.send_photo(chat_id=chat_id, photo=f, caption=text, caption_entities=entities, reply_markup=kb)
 
 async def _answer_menu_media(message: types.Message, photo_path: str, caption: str, kb):
-    """Ответить баннером главного меню с учётом формата файла."""
+    """Ответить баннером главного меню с Premium-эмодзи и blockquote."""
     ext = os.path.splitext(photo_path)[1].lower()
     f = FSInputFile(photo_path)
+    text, entities = _html_payload(caption)
     if ext == ".mp4":
-        await message.answer_video(video=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await message.answer_video(video=f, caption=text, caption_entities=entities, reply_markup=kb)
     elif ext == ".gif":
-        await message.answer_animation(animation=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await message.answer_animation(animation=f, caption=text, caption_entities=entities, reply_markup=kb)
     else:
-        await message.answer_photo(photo=f, caption=caption, reply_markup=kb, parse_mode="HTML")
+        await message.answer_photo(photo=f, caption=text, caption_entities=entities, reply_markup=kb)
 
 async def _send_banner(chat_id: int, photo_path: str | None, text: str, kb, fallback_send):
-    """
-    Универсальная отправка баннера с поддержкой .mp4/.gif/.png.
-    fallback_send — корутина без аргументов для отправки чистого текста.
-    """
+    """Универсальная отправка баннера с настоящими MessageEntity."""
     if not photo_path or not os.path.exists(photo_path):
-        await fallback_send()
+        text_plain, entities = _html_payload(text)
+        try:
+            await bot.send_message(chat_id=chat_id, text=text_plain, entities=entities, reply_markup=kb)
+        except Exception:
+            await fallback_send()
         return
     ext = os.path.splitext(photo_path)[1].lower()
     f = FSInputFile(photo_path)
     try:
+        text_plain, entities = _html_payload(text)
         if ext == ".mp4":
-            await bot.send_video(chat_id=chat_id, video=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await bot.send_video(chat_id=chat_id, video=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
         elif ext == ".gif":
-            await bot.send_animation(chat_id=chat_id, animation=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await bot.send_animation(chat_id=chat_id, animation=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
         else:
-            await bot.send_photo(chat_id=chat_id, photo=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await bot.send_photo(chat_id=chat_id, photo=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
     except Exception:
         await fallback_send()
 
 
 async def _answer_banner(message: types.Message, photo_path: str | None, text: str, kb):
-    """
-    Универсальный ответ баннером с поддержкой .mp4/.gif/.png.
-    Если баннера нет — отправляет чистый текст.
-    """
+    """Ответить баннером с Premium custom emoji и blockquote."""
+    text_plain, entities = _html_payload(text)
     if not photo_path or not os.path.exists(photo_path):
-        await message.answer(text, reply_markup=kb, parse_mode="HTML")
+        await message.answer(text_plain, entities=entities, reply_markup=kb)
         return
     ext = os.path.splitext(photo_path)[1].lower()
     f = FSInputFile(photo_path)
     try:
         if ext == ".mp4":
-            await message.answer_video(video=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await message.answer_video(video=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
         elif ext == ".gif":
-            await message.answer_animation(animation=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await message.answer_animation(animation=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
         else:
-            await message.answer_photo(photo=f, caption=text, reply_markup=kb, parse_mode="HTML")
+            await message.answer_photo(photo=f, caption=text_plain, caption_entities=entities, reply_markup=kb)
     except Exception:
-        await message.answer(text, reply_markup=kb, parse_mode="HTML")
+        await message.answer(text_plain, entities=entities, reply_markup=kb)
 
 
 async def _edit_or_send_banner(callback_query: types.CallbackQuery, photo_path: str | None, text: str, kb):
@@ -1108,25 +1127,26 @@ async def _edit_or_send_banner(callback_query: types.CallbackQuery, photo_path: 
     Для callback: редактирует текущее сообщение (edit_media + edit_caption),
     если не получилось — удаляет старое и отправляет новое.
     """
+    text_plain, entities = _html_payload(text)
     if not photo_path or not os.path.exists(photo_path):
         try:
-            await callback_query.message.edit_caption(caption=text, reply_markup=kb, parse_mode="HTML")
+            await callback_query.message.edit_caption(caption=text_plain, caption_entities=entities, reply_markup=kb)
         except TelegramBadRequest as ex:
             if "no caption" in str(ex).lower() or "message is not modified" not in str(ex).lower():
                 try:
-                    await callback_query.message.edit_text(text=text, reply_markup=kb, parse_mode="HTML")
+                    await callback_query.message.edit_text(text=text_plain, entities=entities, reply_markup=kb)
                 except Exception:
-                    await callback_query.message.answer(text=text, reply_markup=kb, parse_mode="HTML")
+                    await callback_query.message.answer(text=text_plain, entities=entities, reply_markup=kb)
         return
     ext = os.path.splitext(photo_path)[1].lower()
     f = FSInputFile(photo_path)
     try:
         if ext == ".mp4":
-            media = types.InputMediaVideo(media=f, caption=text, parse_mode="HTML")
+            media = types.InputMediaVideo(media=f, caption=text_plain, caption_entities=entities)
         elif ext == ".gif":
-            media = types.InputMediaAnimation(media=f, caption=text, parse_mode="HTML")
+            media = types.InputMediaAnimation(media=f, caption=text_plain, caption_entities=entities)
         else:
-            media = types.InputMediaPhoto(media=f, caption=text, parse_mode="HTML")
+            media = types.InputMediaPhoto(media=f, caption=text_plain, caption_entities=entities)
         await callback_query.message.edit_media(media=media, reply_markup=kb)
     except Exception:
         try:
@@ -1136,16 +1156,16 @@ async def _edit_or_send_banner(callback_query: types.CallbackQuery, photo_path: 
             except Exception:
                 pass
             if ext == ".mp4":
-                await callback_query.message.answer_video(video=FSInputFile(photo_path), caption=text, reply_markup=kb, parse_mode="HTML")
+                await callback_query.message.answer_video(video=FSInputFile(photo_path), caption=text_plain, caption_entities=entities, reply_markup=kb)
             elif ext == ".gif":
-                await callback_query.message.answer_animation(animation=FSInputFile(photo_path), caption=text, reply_markup=kb, parse_mode="HTML")
+                await callback_query.message.answer_animation(animation=FSInputFile(photo_path), caption=text_plain, caption_entities=entities, reply_markup=kb)
             else:
-                await callback_query.message.answer_photo(photo=FSInputFile(photo_path), caption=text, reply_markup=kb, parse_mode="HTML")
+                await callback_query.message.answer_photo(photo=FSInputFile(photo_path), caption=text_plain, caption_entities=entities, reply_markup=kb)
         except Exception:
             try:
-                await callback_query.message.edit_caption(caption=text, reply_markup=kb, parse_mode="HTML")
+                await callback_query.message.edit_caption(caption=text_plain, caption_entities=entities, reply_markup=kb)
             except Exception:
-                await callback_query.message.answer(text=text, reply_markup=kb, parse_mode="HTML")
+                await callback_query.message.answer(text=text_plain, entities=entities, reply_markup=kb)
 
 
 # ─── Главное меню: 1 изображение на каждый из 6 языков ───────────────────────
@@ -1251,7 +1271,8 @@ async def show_main_menu(message: types.Message, state: FSMContext):
         pass
     except Exception:
         try:
-            await message.answer(start_text, reply_markup=kb, parse_mode="HTML")
+            plain, entities = _html_payload(start_text)
+            await message.answer(plain, entities=entities, reply_markup=kb)
         except TelegramForbiddenError:
             pass
 
