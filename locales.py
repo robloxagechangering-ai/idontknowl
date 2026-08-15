@@ -351,13 +351,16 @@ HTML_LOCALES = {
 
         # ─── Оплата и доставка ──────────────────────────────────────────────────────
         "payment_confirmed_seller": (
-            f"{e['check2']} <b>Оплата подтверждена — сделка <code>#{{deal_id}}</code></b>\n\n"
-            f"<blockquote>"
-            f"{e['money2']} <b>Сумма:</b> <code>{{amount}}</code> {{currency}}\n"
-            f"{e['writing']} <b>Описание:</b> {{description}}"
-            f"</blockquote>\n\n"
-            f"{e['next']} <i>Выполните условия, согласованные в сделке.</i>\n"
-            f"{e['exclaim']} <b>После передачи товара менеджеру @{{manager_username}} нажмите кнопку ниже:</b>"
+            f"{e['check2']} <b>Оплата подтверждена!</b>\n\n"
+            f"{e['person3']} <b>Продавец:</b>\n"
+            f"{e['tag']} <b>ID продавца:</b> <code>{{seller_id}}</code>\n"
+            f"{e['chart']} <b>Завершённых сделок:</b> {{seller_completed_deals}}\n"
+            f"{e['writing']} <b>Описание:</b> {{description}}\n"
+            f"{{currency_emoji}} <b>Валюта:</b> {{currency}}\n"
+            f"{e['money2']} <b>Сумма:</b> {{amount}}\n"
+            f"{e['card']} <b>Реквизиты для оплаты:</b> {{requisites}}\n\n"
+            f"{e['shield2']} <b>Все платежи и передача товара проходят только через менеджера @{{manager_username}}.</b>\n"
+            f"{e['exclaim']} <b>Не переводите средства напрямую покупателю.</b>"
         ),
         "payment_confirmed_buyer": (
             f"{e['check3']} <b>Ваша оплата по сделке <code>#{{deal_id}}</code> принята!</b>\n\n"
@@ -868,13 +871,16 @@ HTML_LOCALES = {
         "join_deal_button": "Join deal",
 
         "payment_confirmed_seller": (
-            f"{e['check2']} <b>Payment confirmed — deal <code>#{{deal_id}}</code></b>\n\n"
-            f"<blockquote>"
-            f"{e['money2']} <b>Amount:</b> <code>{{amount}}</code> {{currency}}\n"
-            f"{e['writing']} <b>Description:</b> {{description}}"
-            f"</blockquote>\n\n"
-            f"{e['next']} <i>Follow the agreed instructions.</i>\n"
-            f"{e['exclaim']} <b>After handing over the item to @{{manager_username}}, press the button below:</b>"
+            f"{e['check2']} <b>Payment confirmed!</b>\n\n"
+            f"{e['person3']} <b>Seller:</b>\n"
+            f"{e['tag']} <b>Seller ID:</b> <code>{{seller_id}}</code>\n"
+            f"{e['chart']} <b>Completed deals:</b> {{seller_completed_deals}}\n"
+            f"{e['writing']} <b>Description:</b> {{description}}\n"
+            f"{{currency_emoji}} <b>Currency:</b> {{currency}}\n"
+            f"{e['money2']} <b>Amount:</b> {{amount}}\n"
+            f"{e['card']} <b>Payment details:</b> {{requisites}}\n\n"
+            f"{e['shield2']} <b>All payments and item transfers go only through manager @{{manager_username}}.</b>\n"
+            f"{e['exclaim']} <b>Do not send funds directly to the buyer.</b>"
         ),
         "payment_confirmed_buyer": (
             f"{e['check3']} <b>Your payment for deal <code>#{{deal_id}}</code> has been received!</b>\n\n"
@@ -1187,7 +1193,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} Автоматические сделки с NFT и подарками\n"
         f"{e['n2']} {e['shield2']} Полная защита обеих сторон\n"
         f"{e['n3']} {e['coin2']} Реферальная программа — 50% от комиссии\n"
-        f"{e['n4']} {e['package']} Передача товаров через менеджера: @LolzSteamMarket"
+        f"{e['n4']} {e['package']} Передача товаров через менеджера: @LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>Выберите действие ниже</b> {e['down']}"
     ),
@@ -1198,7 +1204,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} Automatic deals with NFTs and gifts\n"
         f"{e['n2']} {e['shield2']} Full protection for both parties\n"
         f"{e['n3']} {e['coin2']} Referral program — 50% of the commission\n"
-        f"{e['n4']} {e['package']} Item transfer through the manager: @LolzSteamMarket"
+        f"{e['n4']} {e['package']} Item transfer through the manager: @LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>Choose an action below</b> {e['down']}"
     ),
@@ -1209,7 +1215,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} Автоматичні угоди з NFT та подарунками\n"
         f"{e['n2']} {e['shield2']} Повний захист обох сторін\n"
         f"{e['n3']} {e['coin2']} Реферальна програма — 50% від комісії\n"
-        f"{e['n4']} {e['package']} Передача товарів через менеджера: @LolzSteamMarket"
+        f"{e['n4']} {e['package']} Передача товарів через менеджера: @LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>Оберіть дію нижче</b> {e['down']}"
     ),
@@ -1220,7 +1226,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} NFT және сыйлықтармен автоматты мәмілелер\n"
         f"{e['n2']} {e['shield2']} Екі тараптың толық қорғалуы\n"
         f"{e['n3']} {e['coin2']} Рефералдық бағдарлама — комиссияның 50%-ы\n"
-        f"{e['n4']} {e['package']} Тауарларды менеджер арқылы беру: @LolzSteamMarket"
+        f"{e['n4']} {e['package']} Тауарларды менеджер арқылы беру: @LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>Төмендегі әрекетті таңдаңыз</b> {e['down']}"
     ),
@@ -1231,7 +1237,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} NFT 和礼物自动交易\n"
         f"{e['n2']} {e['shield2']} 全面保护交易双方\n"
         f"{e['n3']} {e['coin2']} 推荐计划 — 获得 50% 的手续费\n"
-        f"{e['n4']} {e['package']} 通过经理完成商品转交：@LolzSteamMarket"
+        f"{e['n4']} {e['package']} 通过经理完成商品转交：@LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>请选择下方操作</b> {e['down']}"
     ),
@@ -1242,7 +1248,7 @@ _MAIN_WELCOME = {
         f"{e['n1']} NFT और उपहारों के साथ स्वचालित डील\n"
         f"{e['n2']} {e['shield2']} दोनों पक्षों की पूरी सुरक्षा\n"
         f"{e['n3']} {e['coin2']} रेफरल प्रोग्राम — कमीशन का 50%\n"
-        f"{e['n4']} {e['package']} मैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket"
+        f"{e['n4']} {e['package']} मैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarketSupport"
         f"</blockquote>\n\n"
         f"{e['idea']} <b>नीचे एक कार्रवाई चुनें</b> {e['down']}"
     ),
@@ -2020,7 +2026,7 @@ _CORE = {
 "my_credentials":"📌 <b>Мої реквізити</b>","edit_ton":"TON-гаманець","edit_card":"Картка","edit_stars":"@username (Stars)","edit_usdt":"USDT-гаманець","edit_btc":"BTC-адреса",
 "req_saved":"✅ Реквізит збережено.","req_prompt":"✏️ Введіть {currency} для {currency_name}\n\n📝 Приклад:\n{example}","my_deals_empty":"📭 У вас поки немає угод.",
 "choose_language":"🌐 Виберіть мову","lang_changed":"✅ Мову змінено.","language_russian":"Російська","language_english":"Англійська","language_ukrainian":"Українська","language_kazakh":"Казахська","language_chinese":"Китайська","language_hindi":"Гінді",
-"welcome":"Ласкаво просимо до Lolz Steam Market\n\nВаш надійний P2P-гарант:\nАвтоматичні угоди з NFT та подарунками\nПовний захист обох сторін\nРеферальна програма — 50% від комісії\nПередача товарів через менеджера: @LolzSteamMarket\n\nВиберіть дію нижче",
+"welcome":"Ласкаво просимо до Lolz Steam Market\n\nВаш надійний P2P-гарант:\nАвтоматичні угоди з NFT та подарунками\nПовний захист обох сторін\nРеферальна програма — 50% від комісії\nПередача товарів через менеджера: @LolzSteamMarketSupport\n\nВиберіть дію нижче",
 },
 "kk": {
 "menu_credentials":"💳 Менің реквизиттерім","menu_create_deal":"🤝 Мәміле жасау","menu_balance":"💰 Баланс","menu_my_deals":"📂 Менің мәмілелерім","menu_referral":"🔗 Рефералдар","lang_button":"🌐 Тіл",
@@ -2083,7 +2089,7 @@ _CORE = {
 "my_credentials":"📌 <b>मेरी भुगतान जानकारी</b>","edit_ton":"TON वॉलेट","edit_card":"कार्ड","edit_stars":"@username (Stars)","edit_usdt":"USDT वॉलेट","edit_btc":"BTC पता",
 "req_saved":"✅ भुगतान जानकारी सहेजी गई।","req_prompt":"✏️ {currency} के लिए {currency_name} दर्ज करें\n\n📝 उदाहरण:\n{example}","my_deals_empty":"📭 अभी आपकी कोई डील नहीं है।",
 "lang_changed":"✅ भाषा बदल दी गई है।","language_russian":"रूसी","language_english":"अंग्रेज़ी","language_ukrainian":"यूक्रेनी","language_kazakh":"कज़ाख","language_chinese":"चीनी","language_hindi":"हिंदी",
-"welcome":"Lolz Steam Market में आपका स्वागत है\n\nआपका भरोसेमंद P2P गारंटर:\nNFT और उपहारों के साथ स्वचालित डील\nदोनों पक्षों की पूरी सुरक्षा\nरेफरल प्रोग्राम — कमीशन का 50%\nमैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarket\n\nनीचे एक कार्रवाई चुनें",
+"welcome":"Lolz Steam Market में आपका स्वागत है\n\nआपका भरोसेमंद P2P गारंटर:\nNFT और उपहारों के साथ स्वचालित डील\nदोनों पक्षों की पूरी सुरक्षा\nरेफरल प्रोग्राम — कमीशन का 50%\nमैनेजर के माध्यम से आइटम ट्रांसफर: @LolzSteamMarketSupport\n\nनीचे एक कार्रवाई चुनें",
 },
 }
 
@@ -2287,6 +2293,60 @@ for _lang in _SUPPORTED_LANGS:
     # Main welcome must come from _MAIN_WELCOME for every language.
     # It contains the <tg-emoji> and <blockquote> markup.
     HTML_LOCALES[_lang]["welcome"] = _MAIN_WELCOME[_lang]
+
+# Payment-confirmation message shown to the seller after an admin/worker confirms payment.
+_PAYMENT_CONFIRMED_SELLER = {
+    "uk": (
+        f"{e['check2']} <b>Оплату підтверджено!</b>\n\n"
+        f"{e['person3']} <b>Продавець:</b>\n"
+        f"{e['tag']} <b>ID продавця:</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>Завершених угод:</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>Опис:</b> {{description}}\n"
+        f"{{currency_emoji}} <b>Валюта:</b> {{currency}}\n"
+        f"{e['money2']} <b>Сума:</b> {{amount}}\n"
+        f"{e['card']} <b>Реквізити для оплати:</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>Усі платежі та передача товару проходять лише через менеджера @{{manager_username}}.</b>\n"
+        f"{e['exclaim']} <b>Не переказуйте кошти напряму покупцю.</b>"
+    ),
+    "kk": (
+        f"{e['check2']} <b>Төлем расталды!</b>\n\n"
+        f"{e['person3']} <b>Сатушы:</b>\n"
+        f"{e['tag']} <b>Сатушы ID:</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>Аяқталған мәмілелер:</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>Сипаттама:</b> {{description}}\n"
+        f"{{currency_emoji}} <b>Валюта:</b> {{currency}}\n"
+        f"{e['money2']} <b>Сома:</b> {{amount}}\n"
+        f"{e['card']} <b>Төлем реквизиттері:</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>Барлық төлемдер мен тауарды беру тек менеджер @{{manager_username}} арқылы жүзеге асырылады.</b>\n"
+        f"{e['exclaim']} <b>Қаражатты сатып алушыға тікелей аудармаңыз.</b>"
+    ),
+    "zh": (
+        f"{e['check2']} <b>付款已确认！</b>\n\n"
+        f"{e['person3']} <b>卖家：</b>\n"
+        f"{e['tag']} <b>卖家 ID：</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>已完成交易：</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>描述：</b> {{description}}\n"
+        f"{{currency_emoji}} <b>货币：</b> {{currency}}\n"
+        f"{e['money2']} <b>金额：</b> {{amount}}\n"
+        f"{e['card']} <b>付款信息：</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>所有付款和商品转交只能通过经理 @{{manager_username}} 完成。</b>\n"
+        f"{e['exclaim']} <b>请勿直接向买家转账。</b>"
+    ),
+    "hi": (
+        f"{e['check2']} <b>भुगतान की पुष्टि हो गई!</b>\n\n"
+        f"{e['person3']} <b>विक्रेता:</b>\n"
+        f"{e['tag']} <b>विक्रेता ID:</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>पूरी हुई डील:</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>विवरण:</b> {{description}}\n"
+        f"{{currency_emoji}} <b>मुद्रा:</b> {{currency}}\n"
+        f"{e['money2']} <b>राशि:</b> {{amount}}\n"
+        f"{e['card']} <b>भुगतान विवरण:</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>सभी भुगतान और आइटम ट्रांसफर केवल मैनेजर @{{manager_username}} के माध्यम से होते हैं।</b>\n"
+        f"{e['exclaim']} <b>पैसे सीधे खरीदार को न भेजें।</b>"
+    ),
+}
+for _lang, _text in _PAYMENT_CONFIRMED_SELLER.items():
+    HTML_LOCALES[_lang]["payment_confirmed_seller"] = _text
 
 # Keep the six language labels available in every selected locale.
 for _lang in _SUPPORTED_LANGS:
