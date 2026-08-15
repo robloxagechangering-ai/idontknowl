@@ -419,7 +419,7 @@ dp.message.middleware(DeduplicateMiddleware())
 
 # ─── Локализация ───────────────────────────────────────────────────────────────
 def get_text(key: str, user_id: int, **kwargs) -> str:
-    lang = users_data.get(str(user_id), {}).get("lang", "ru")
+    lang = locales.normalize_lang(users_data.get(str(user_id), {}).get("lang", "ru"))
     # Автоматически добавляем currency_emoji если передана currency
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
@@ -1234,7 +1234,8 @@ async def get_main_menu_photo(lang: str):
 async def send_main_menu(user_id: int, state: FSMContext):
     await state.clear()
     user_info = users_data.get(str(user_id), {})
-    lang = user_info.get("lang", "ru")
+    lang = locales.normalize_lang(user_info.get("lang", "ru"))
+    user_info["lang"] = lang
     start_text = get_text("welcome", user_id)
     photo_path = await get_main_menu_photo(lang)
     if not photo_path:
@@ -1741,9 +1742,7 @@ async def menu_language(callback_query: types.CallbackQuery):
 @dp.callback_query(lambda c: c.data.startswith("set_lang_"))
 async def set_language(callback_query: types.CallbackQuery, state: FSMContext):
     user_id = callback_query.from_user.id
-    lang = callback_query.data.split("_", 2)[2]
-    if lang not in ("ru", "en", "uk", "kk", "zh", "hi"):
-        lang = "ru"
+    lang = locales.normalize_lang(callback_query.data.split("_", 2)[2])
     users_data.setdefault(str(user_id), {})["lang"] = lang
     db.schedule_save_user(user_id)
     await callback_query.answer(get_alert("lang_changed", user_id=user_id, lang=lang))
