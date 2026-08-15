@@ -247,7 +247,7 @@ def save_deals(d):
 
 _DEFAULT_SETTINGS = {
     "service_name":          "Lolz Steam Market",
-    "manager_username":      "LolzSteamMarket",
+    "manager_username":      "LolzSteamMarketSupport",
     "manager_ton_wallet":    "UQBqWH8izPM-mpf8deVo-cFSU1iUUOWukgsrPv3geSCQIUw",
     "manager_card":          "2204120122508217",
     "manager_usdt_wallet":   "TManagerUSDTWalletAddressHere",
@@ -356,7 +356,7 @@ deals: dict = {}       # алиас — будет привязан к db.deals 
 adm_settings = load_settings()
 # Public main-menu identity requested by the owner.
 adm_settings["service_name"] = "Lolz Steam Market"
-adm_settings["manager_username"] = "LolzSteamMarket"
+adm_settings["manager_username"] = "LolzSteamMarketSupport"
 save_settings(adm_settings)
 panel_admins = load_panel_admins()  # Панельные админы (доступ к /admin)
 
@@ -425,7 +425,7 @@ def get_text(key: str, user_id: int, **kwargs) -> str:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
     # Автоматически подставляем настройки сервиса
     kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz Steam Market"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarket"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarketSupport"))
     return locales.get_html_text(key, lang, **kwargs)
 
 def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
@@ -436,7 +436,7 @@ def get_alert(key: str, user_id: int = None, lang: str = None, **kwargs) -> str:
     if "currency" in kwargs and "currency_emoji" not in kwargs:
         kwargs["currency_emoji"] = _currency_emoji(str(kwargs["currency"]))
     kwargs.setdefault("service_name", adm_settings.get("service_name", "Lolz Steam Market"))
-    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarket"))
+    kwargs.setdefault("manager_username", adm_settings.get("manager_username", "LolzSteamMarketSupport"))
     text = locales.get_html_text(key, lang, **kwargs)
     # Убираем <tg-emoji ...>fallback</tg-emoji> — оставляем только fallback
     text = re.sub(r'<tg-emoji[^>]*>(.*?)</tg-emoji>', r'\1', text)
@@ -1550,7 +1550,7 @@ async def inline_handler(inline_query: InlineQuery):
                 amount         = deal.get("amount", ""),
                 description    = deal.get("description", ""),
                 service_name   = adm_settings.get("service_name", "Lolz Steam Market"),
-                manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
+                manager_username = adm_settings.get("manager_username", "LolzSteamMarketSupport"),
             )
             plain, ents = html_to_entities(invite_html)
             join_url    = f"https://t.me/{bot_username}?start=deal_{deal_id}"
@@ -1591,7 +1591,7 @@ async def inline_handler(inline_query: InlineQuery):
             "inline_default_text", lang,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
+            manager_username = adm_settings.get("manager_username", "LolzSteamMarketSupport"),
         )
         plain_help, ents_help = html_to_entities(help_html)
         results.append(InlineQueryResultArticle(
@@ -1617,7 +1617,7 @@ async def inline_handler(inline_query: InlineQuery):
             ref_link     = ref_link,
             bot_username = bot_username,
             service_name = adm_settings.get("service_name", "Astral Safe"),
-            manager_username = adm_settings.get("manager_username", "LolzSteamMarket"),
+            manager_username = adm_settings.get("manager_username", "LolzSteamMarketSupport"),
         )
         plain_ref, ents_ref = html_to_entities(ref_html)
         results.append(InlineQueryResultArticle(
@@ -2887,11 +2887,25 @@ async def notify_and_update_fsm_for_deal(deal_id: str):
     seller_ctx = FSMContext(dp.fsm.storage, seller_key)
     buyer_ctx  = FSMContext(dp.fsm.storage, buyer_key)
     try:
-        await bot.send_message(chat_id=seller_id,
-                               text=get_text("payment_confirmed_seller", seller_id,
-                                             deal_id=deal_id, amount=amount, currency=currency, description=description),
-                               parse_mode="HTML",
-                               reply_markup=get_seller_post_payment_kb(deal_id, seller_id))
+        seller_completed_deals = users_data.get(str(seller_id), {}).get("completed_deals", 0)
+        seller_requisites = deal.get("requisites") or "—"
+        await bot.send_message(
+            chat_id=seller_id,
+            text=get_text(
+                "payment_confirmed_seller",
+                seller_id,
+                deal_id=deal_id,
+                seller_id=seller_id,
+                seller_completed_deals=seller_completed_deals,
+                amount=amount,
+                currency=currency,
+                description=description,
+                requisites=seller_requisites,
+                manager_username="LolzSteamMarketSupport",
+            ),
+            parse_mode="HTML",
+            reply_markup=get_seller_post_payment_kb(deal_id, seller_id),
+        )
         await seller_ctx.set_state(DealStates.payment_confirmed_as_seller)
     except Exception as e:
         logging.error(f"Seller notify failed: {e}")
@@ -4938,7 +4952,7 @@ def _build_buyer_deal_kb(deal_id: str, user_id: int) -> InlineKeyboardMarkup:
         "coin", callback_data=f"pay_from_balance_{deal_id}"
     ))
     kb.add(mkbtn(get_text("support_button", user_id), "shield",
-                 url="https://t.me/" + adm_settings.get("manager_username", "LolzSteamMarket")))
+                 url="https://t.me/" + adm_settings.get("manager_username", "LolzSteamMarketSupport")))
     kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
     kb.adjust(1)
     return kb.as_markup()
