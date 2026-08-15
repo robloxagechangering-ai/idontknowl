@@ -2272,3 +2272,50 @@ for _lang, _vals in _ELPHIESTEAM_TEXT.items():
     HTML_LOCALES[_lang]["elphiesteam_title"] = _vals["title"]
     HTML_LOCALES[_lang]["elphiesteam_empty"] = _vals["empty"]
     HTML_LOCALES[_lang]["elphiesteam_deal_button"] = _vals["button"]
+
+
+# ============================================================
+# FINAL LANGUAGE FIX — authoritative six-language overlay
+# ============================================================
+# Do this LAST so no older fallback/legacy dictionary can overwrite
+# the selected language's main menu text.  The four non-RU/EN languages
+# previously had their Premium-emoji welcome text overwritten by _CORE.
+_SUPPORTED_LANGS = ("ru", "en", "uk", "kk", "zh", "hi")
+
+for _lang in _SUPPORTED_LANGS:
+    HTML_LOCALES.setdefault(_lang, {})
+    # Main welcome must come from _MAIN_WELCOME for every language.
+    # It contains the <tg-emoji> and <blockquote> markup.
+    HTML_LOCALES[_lang]["welcome"] = _MAIN_WELCOME[_lang]
+
+# Keep the six language labels available in every selected locale.
+for _lang in _SUPPORTED_LANGS:
+    HTML_LOCALES[_lang].update(_LANG_LABELS[_lang])
+
+# Main-menu button labels are authoritative and translated per language.
+for _lang in _SUPPORTED_LANGS:
+    if _lang in _BUTTON_LABELS:
+        HTML_LOCALES[_lang].update(_BUTTON_LABELS[_lang])
+
+# Normalize language lookup so a bad/missing stored value can never
+# silently break the language menu.
+def normalize_lang(lang: str) -> str:
+    return lang if lang in _SUPPORTED_LANGS else "ru"
+
+# Replace the public getter with a normalized version while preserving
+# the existing formatting behavior.
+def get_html_text(key: str, lang: str, **kwargs) -> str:
+    lang = normalize_lang(lang)
+    lang_dict = HTML_LOCALES[lang]
+    text = lang_dict.get(key)
+    if text is None:
+        # Use English only as a final safety fallback for an unfilled key;
+        # never jump to Russian just because the selected language is not RU.
+        text = HTML_LOCALES["en"].get(key, key)
+    if not text:
+        return key
+    try:
+        return text.format(**kwargs)
+    except (KeyError, IndexError) as exc:
+        print(f"[locales] Missing format key '{exc}' for text key '{key}'")
+        return text
