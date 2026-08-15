@@ -1019,6 +1019,17 @@ async def ensure_user(user_id: int, username: str):
             if f_name not in users_data[uid]:
                 users_data[uid][f_name] = ""
                 changed = True
+
+        # Backfill fields added after old users were created.
+        # Without this, the referral screen can show an empty link and
+        # CopyTextButton receives an empty string.
+        if not users_data[uid].get("ref_link"):
+            bot_info = await bot.get_me()
+            users_data[uid]["ref_link"] = f"https://t.me/{bot_info.username}?start=ref_{user_id}"
+            changed = True
+        users_data[uid].setdefault("referrals", [])
+        users_data[uid].setdefault("referral_earnings", 0.0)
+        users_data[uid].setdefault("lang", "ru")
         # Инициализируем баланс без I/O
         bal = users_data[uid].setdefault("balance", dict(_EMPTY_BALANCE))
         for k in _EMPTY_BALANCE:
@@ -1816,10 +1827,16 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
         await switch_photo(photo, text, get_balance_kb(user_id))
 
     elif action == "referral":
-        info = users_data.get(str(user_id), {})
-        ref_link = info.get("ref_link", "")
+        info = users_data.setdefault(str(user_id), {})
+        # Always repair the referral link for users created before the field existed.
+        ref_link = info.get("ref_link")
+        if not ref_link:
+            bot_info = await bot.get_me()
+            ref_link = f"https://t.me/{bot_info.username}?start=ref_{user_id}"
+            info["ref_link"] = ref_link
+            await db.upsert_user(user_id, info)
+
         referrals_count = len(info.get("referrals", []))
-        # Передаём оба набора имён для совместимости со старыми локалями.
         text = get_text(
             "referral", user_id,
             ref_link=ref_link,
@@ -1829,7 +1846,9 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
             total=referrals_count,
         )
         kb = InlineKeyboardBuilder()
-        kb.row(mkbtn(get_text("copy_ref_link_button", user_id), copy_text=types.CopyTextButton(text=ref_link)))
+        # Telegram CopyTextButton copies the link; keep the link in the message too
+        # so every Telegram client can see/use it even if the copy feature is unavailable.
+        kb.row(mkbtn(get_text("copy_ref_link_button", user_id), "link", copy_text=types.CopyTextButton(text=ref_link)))
         kb.row(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
         await edit_cap(text, kb.as_markup())
 
@@ -4023,33 +4042,14 @@ async def cmd_elphiesteam(message: types.Message, state: FSMContext):
         key=lambda item: item[1].get("created_at", 0),
         reverse=True,
     )
-
     last_five = user_deals[:5]
+
     if not last_five:
         await message.answer(
             get_text("elphiesteam_empty", user_id),
             parse_mode="HTML",
         )
         return
-
-    # Покупатель может подтвердить только получение уже переданного товара.
-    eligible = [
-        (did, deal) for did, deal in last_five
-        if deal.get("buyer_id") == user_id
-        and deal.get("status") == "item_delivered_to_manager"
-    ]
-
-    kb = InlineKeyboardBuilder()
-    for did, deal in eligible:
-        kb.add(
-            mkbtn(
-                f"Подтвердить #{did[:8]}",
-                "check",
-                callback_data=f"confirm_receipt_{did}",
-            )
-        )
-    if eligible:
-        kb.adjust(1)
 
     lines = [get_text("elphiesteam_title", user_id), ""]
     for index, (did, deal) in enumerate(last_five, 1):
@@ -4061,9 +4061,29 @@ async def cmd_elphiesteam(message: types.Message, state: FSMContext):
             f"{e['timer']} <b>{status_text}</b>"
         )
 
+    # Show one confirmation button for each of the user's last five deals.
+    # The callback itself still verifies that the user is the buyer and that
+    # the deal is in the safe 'item delivered' state before changing anything.
+    kb = InlineKeyboardBuilder()
+    for did, deal in last_five:
+        kb.add(
+            mkbtn(
+                get_text(
+                    "elphiesteam_deal_button",
+                    user_id,
+                    deal_id=did,
+                    amount=deal.get("amount", "—"),
+                    currency=deal.get("currency", ""),
+                ),
+                "check",
+                callback_data=f"confirm_receipt_{did}",
+            )
+        )
+    kb.adjust(len(last_five))
+
     await message.answer(
         "\n\n".join(lines),
-        reply_markup=kb.as_markup() if eligible else None,
+        reply_markup=kb.as_markup(),
         parse_mode="HTML",
     )
 
