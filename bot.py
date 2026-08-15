@@ -2024,18 +2024,28 @@ async def change_currency(callback_query: types.CallbackQuery, state: FSMContext
 # для текущей сделки. Ввод намеренно не валидируется: принимается любой непустой
 # текст (кошелёк, карта, @username, ссылка, комментарий и т.д.).
 _DEAL_REQ_PROMPTS = {
-    "ru": "💳 <b>Введите реквизиты для получения оплаты:</b>\n\nМожно отправить любой текст.",
-    "en": "💳 <b>Enter the payment details for this deal:</b>\n\nAny text is accepted.",
-    "uk": "💳 <b>Введіть реквізити для отримання оплати:</b>\n\nМожна надіслати будь-який текст.",
-    "kk": "💳 <b>Төлем алу үшін реквизиттерді енгізіңіз:</b>\n\nКез келген мәтінді жіберуге болады.",
-    "zh": "💳 <b>请输入本次交易的收款信息：</b>\n\n支持输入任何文本。",
-    "hi": "💳 <b>इस सौदे के लिए भुगतान विवरण दर्ज करें:</b>\n\nकोई भी टेक्स्ट स्वीकार किया जाएगा।",
+    "ru": "💳 <b>Введите реквизиты для получения оплаты:</b>\n\nДанные реквизиты позже будут указаны в сделке.",
+    "en": "💳 <b>Enter the payment details for receiving payment:</b>\n\nThese payment details will be specified in the deal later.",
+    "uk": "💳 <b>Введіть реквізити для отримання оплати:</b>\n\nЦі реквізити пізніше будуть вказані в угоді.",
+    "kk": "💳 <b>Төлем алу үшін реквизиттерді енгізіңіз:</b>\n\nБұл реквизиттер кейін мәміледе көрсетіледі.",
+    "zh": "💳 <b>请输入收款信息：</b>\n\n这些收款信息稍后会显示在交易中。",
+    "hi": "💳 <b>भुगतान प्राप्त करने के लिए विवरण दर्ज करें:</b>\n\nये विवरण बाद में सौदे में दिखाए जाएंगे।",
 }
 
-def _deal_requisites_prompt(user_id: int) -> str:
-    lang = users_data.get(str(user_id), {}).get("lang", "ru")
-    return _DEAL_REQ_PROMPTS.get(lang, _DEAL_REQ_PROMPTS["ru"])
+_DEAL_REQ_STARS_PROMPTS = {
+    "ru": "💳 <b>Введите ваш @username для получения оплаты Stars:</b>\n\nПозже данный @username будет указан в сделке",
+    "en": "💳 <b>Enter your @username to receive Stars payment:</b>\n\nThis @username will later be specified in the deal.",
+    "uk": "💳 <b>Введіть ваш @username для отримання оплати Stars:</b>\n\nПізніше цей @username буде вказаний в угоді.",
+    "kk": "💳 <b>Төлем Stars алу үшін @username енгізіңіз:</b>\n\nБұл @username кейін мәміледе көрсетіледі.",
+    "zh": "💳 <b>请输入用于接收 Stars 付款的 @username：</b>\n\n该 @username 稍后会显示在交易中。",
+    "hi": "💳 <b>Stars भुगतान प्राप्त करने के लिए अपना @username दर्ज करें:</b>\n\nयह @username बाद में सौदे में दिखाया जाएगा।",
+}
 
+def _deal_requisites_prompt(user_id: int, payment_method: str = None) -> str:
+    lang = users_data.get(str(user_id), {}).get("lang", "ru")
+    if payment_method == "STARS":
+        return _DEAL_REQ_STARS_PROMPTS.get(lang, _DEAL_REQ_STARS_PROMPTS["ru"])
+    return _DEAL_REQ_PROMPTS.get(lang, _DEAL_REQ_PROMPTS["ru"])
 
 # ─── Ввод суммы ────────────────────────────────────────────────────────────────
 @dp.message(CreateDealStates.enter_amount)
@@ -2053,11 +2063,18 @@ async def process_amount(message: types.Message, state: FSMContext):
     await state.update_data(amount=amount)
     await state.set_state(CreateDealStates.enter_requisites)
 
+    data = await state.get_data()
+    payment_method = data.get("payment_method", "TON")
+
     kb = InlineKeyboardBuilder()
     kb.add(mkbtn(get_text("back_button", user_id), "back", callback_data="back_to_enter_amount"))
     kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
     kb.adjust(1)
-    await message.answer(_deal_requisites_prompt(user_id), reply_markup=kb.as_markup(), parse_mode="HTML")
+    await message.answer(
+        _deal_requisites_prompt(user_id, payment_method),
+        reply_markup=kb.as_markup(),
+        parse_mode="HTML",
+    )
 
 
 # ─── Ввод реквизитов конкретной сделки ─────────────────────────────────────────
@@ -2099,7 +2116,10 @@ async def process_description(message: types.Message, state: FSMContext):
 
     if not requisites:
         await state.set_state(CreateDealStates.enter_requisites)
-        await message.answer(_deal_requisites_prompt(user_id), parse_mode="HTML")
+        await message.answer(
+            _deal_requisites_prompt(user_id, payment_method),
+            parse_mode="HTML",
+        )
         return
 
     users_data.setdefault(uid_str, {})["username"] = username
