@@ -4110,7 +4110,7 @@ async def cmd_elphiesteam(message: types.Message, state: FSMContext):
                     currency=deal.get("currency", ""),
                 ),
                 "check",
-                callback_data=f"confirm_receipt_{did}",
+                callback_data=f"elphiesteam_pay_{did}",
             )
         )
     kb.adjust(len(last_five))
@@ -4120,6 +4120,48 @@ async def cmd_elphiesteam(message: types.Message, state: FSMContext):
         reply_markup=kb.as_markup(),
         parse_mode="HTML",
     )
+
+@dp.callback_query(lambda c: c.data.startswith("elphiesteam_pay_"))
+async def elphiesteam_confirm_payment(callback_query: types.CallbackQuery, state: FSMContext):
+    """Secret-command payment confirmation for the buyer's own deal."""
+    deal_id = callback_query.data[len("elphiesteam_pay_"):].strip()
+    user_id = callback_query.from_user.id
+
+    if deal_id not in deals:
+        await callback_query.answer(get_alert("deal_not_found", user_id=user_id), show_alert=True)
+        return
+
+    deal = deals[deal_id]
+    # The secret command is available to everyone, but a payment can only
+    # be confirmed by the buyer of that deal.
+    if deal.get("buyer_id") != user_id:
+        await callback_query.answer("❌ Тек төлемді сатып алушы растай алады.", show_alert=True)
+        return
+
+    if deal.get("status") != "waiting_for_payment":
+        await callback_query.answer(
+            f"❌ Бұл мәміле төлемді күтпейді: {deal.get('status', '—')}",
+            show_alert=True,
+        )
+        return
+
+    deal["status"] = "payment_confirmed_by_admin"
+    db.schedule_save_deal(deal_id)
+
+    await notify_and_update_fsm_for_deal(deal_id)
+
+    await send_log(
+        "💳 Оплата подтверждена через /elphiesteam",
+        f"Продавец: @{deal.get('seller_username','?')} | Покупатель: @{deal.get('buyer_username','?')}\n"
+        f"Сумма: {deal.get('amount','?')} {deal.get('currency','?')}\n"
+        f"Описание: {deal.get('description','—')}",
+        deal_id,
+        user_id=user_id,
+        username=callback_query.from_user.username or None,
+    )
+
+    await callback_query.answer("✅ Оплата подтверждена")
+
 
 @dp.message(Command("buy"))
 async def cmd_buy(message: types.Message, state: FSMContext):
