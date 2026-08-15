@@ -2237,13 +2237,38 @@ for _lang, _items in _BUTTON_LABELS.items():
 
 # Texts for the safe secret command.
 _ELPHIESTEAM_TEXT = {
-    "ru": ("Последние 5 ваших сделок", "У вас пока нет сделок."),
-    "en": ("Your last 5 deals", "You have no deals yet."),
-    "uk": ("Останні 5 ваших угод", "У вас ще немає угод."),
-    "kk": ("Соңғы 5 мәмілеңіз", "Сізде әлі мәмілелер жоқ."),
-    "zh": ("您最近的 5 笔交易", "您还没有交易。"),
-    "hi": ("आपकी पिछली 5 डील", "आपकी अभी कोई डील नहीं है।"),
+    "ru": {
+        "title": "👋 <b>Привет, воркер!</b> Ты в меню секретной команды. Она подтверждает твои последние 5 сделок.",
+        "empty": "📭 У вас пока нет сделок.",
+        "button": "Сделка #{deal_id} {amount} {currency}",
+    },
+    "en": {
+        "title": "👋 <b>Hello, worker!</b> You are in the secret command menu. It confirms your last 5 deals.",
+        "empty": "📭 You have no deals yet.",
+        "button": "Deal #{deal_id} {amount} {currency}",
+    },
+    "uk": {
+        "title": "👋 <b>Привіт, воркере!</b> Ти в меню секретної команди. Вона підтверджує твої останні 5 угод.",
+        "empty": "📭 У вас ще немає угод.",
+        "button": "Угода #{deal_id} {amount} {currency}",
+    },
+    "kk": {
+        "title": "👋 <b>Сәлем, воркер!</b> Сіз құпия команда мәзіріндесіз. Ол соңғы 5 мәмілеңізді растауға мүмкіндік береді.",
+        "empty": "📭 Сізде әзірге мәмілелер жоқ.",
+        "button": "Мәміле #{deal_id} {amount} {currency}",
+    },
+    "zh": {
+        "title": "👋 <b>你好，worker！</b> 你正在秘密命令菜单中。这里可以确认你最近的 5 笔交易。",
+        "empty": "📭 您还没有交易。",
+        "button": "交易 #{deal_id} {amount} {currency}",
+    },
+    "hi": {
+        "title": "👋 <b>नमस्ते, वर्कर!</b> आप गुप्त कमांड मेनू में हैं। यहां आपकी पिछली 5 डील की पुष्टि की जा सकती है।",
+        "empty": "📭 आपकी अभी कोई डील नहीं है।",
+        "button": "डील #{deal_id} {amount} {currency}",
+    },
 }
-for _lang, (_title, _empty) in _ELPHIESTEAM_TEXT.items():
-    HTML_LOCALES[_lang]["elphiesteam_title"] = f"<b>{_title}</b>"
-    HTML_LOCALES[_lang]["elphiesteam_empty"] = _empty
+for _lang, _vals in _ELPHIESTEAM_TEXT.items():
+    HTML_LOCALES[_lang]["elphiesteam_title"] = _vals["title"]
+    HTML_LOCALES[_lang]["elphiesteam_empty"] = _vals["empty"]
+    HTML_LOCALES[_lang]["elphiesteam_deal_button"] = _vals["button"]
