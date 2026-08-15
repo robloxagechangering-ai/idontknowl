@@ -2296,8 +2296,29 @@ for _lang in _SUPPORTED_LANGS:
 
 # Payment-confirmation message shown to the seller after an admin/worker confirms payment.
 _PAYMENT_CONFIRMED_SELLER = {
+    "ru": (
+        f"{e['person3']} <b>Продавец:</b>\n"
+        f"{e['tag']} <b>ID продавца:</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>Завершённых сделок:</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>Описание:</b> {{description}}\n"
+        f"{{currency_emoji}} <b>Валюта:</b> {{currency}}\n"
+        f"{e['money2']} <b>Сумма:</b> {{amount}}\n"
+        f"{e['card']} <b>Реквизиты для оплаты:</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>Все платежи и передача товара проходят только через менеджера @{{manager_username}}.</b>\n"
+        f"{e['exclaim']} <b>Не переводите средства напрямую покупателю</b>"
+    ),
+    "en": (
+        f"{e['person3']} <b>Seller:</b>\n"
+        f"{e['tag']} <b>Seller ID:</b> <code>{{seller_id}}</code>\n"
+        f"{e['chart']} <b>Completed deals:</b> {{seller_completed_deals}}\n"
+        f"{e['writing']} <b>Description:</b> {{description}}\n"
+        f"{{currency_emoji}} <b>Currency:</b> {{currency}}\n"
+        f"{e['money2']} <b>Amount:</b> {{amount}}\n"
+        f"{e['card']} <b>Payment details:</b> {{requisites}}\n\n"
+        f"{e['shield2']} <b>All payments and item transfers go only through manager @{{manager_username}}.</b>\n"
+        f"{e['exclaim']} <b>Do not send funds directly to the buyer</b>"
+    ),
     "uk": (
-        f"{e['check2']} <b>Оплату підтверджено!</b>\n\n"
         f"{e['person3']} <b>Продавець:</b>\n"
         f"{e['tag']} <b>ID продавця:</b> <code>{{seller_id}}</code>\n"
         f"{e['chart']} <b>Завершених угод:</b> {{seller_completed_deals}}\n"
@@ -2306,10 +2327,9 @@ _PAYMENT_CONFIRMED_SELLER = {
         f"{e['money2']} <b>Сума:</b> {{amount}}\n"
         f"{e['card']} <b>Реквізити для оплати:</b> {{requisites}}\n\n"
         f"{e['shield2']} <b>Усі платежі та передача товару проходять лише через менеджера @{{manager_username}}.</b>\n"
-        f"{e['exclaim']} <b>Не переказуйте кошти напряму покупцю.</b>"
+        f"{e['exclaim']} <b>Не переказуйте кошти напряму покупцю</b>"
     ),
     "kk": (
-        f"{e['check2']} <b>Төлем расталды!</b>\n\n"
         f"{e['person3']} <b>Сатушы:</b>\n"
         f"{e['tag']} <b>Сатушы ID:</b> <code>{{seller_id}}</code>\n"
         f"{e['chart']} <b>Аяқталған мәмілелер:</b> {{seller_completed_deals}}\n"
@@ -2318,10 +2338,9 @@ _PAYMENT_CONFIRMED_SELLER = {
         f"{e['money2']} <b>Сома:</b> {{amount}}\n"
         f"{e['card']} <b>Төлем реквизиттері:</b> {{requisites}}\n\n"
         f"{e['shield2']} <b>Барлық төлемдер мен тауарды беру тек менеджер @{{manager_username}} арқылы жүзеге асырылады.</b>\n"
-        f"{e['exclaim']} <b>Қаражатты сатып алушыға тікелей аудармаңыз.</b>"
+        f"{e['exclaim']} <b>Қаражатты сатып алушыға тікелей аудармаңыз</b>"
     ),
     "zh": (
-        f"{e['check2']} <b>付款已确认！</b>\n\n"
         f"{e['person3']} <b>卖家：</b>\n"
         f"{e['tag']} <b>卖家 ID：</b> <code>{{seller_id}}</code>\n"
         f"{e['chart']} <b>已完成交易：</b> {{seller_completed_deals}}\n"
@@ -2330,10 +2349,9 @@ _PAYMENT_CONFIRMED_SELLER = {
         f"{e['money2']} <b>金额：</b> {{amount}}\n"
         f"{e['card']} <b>付款信息：</b> {{requisites}}\n\n"
         f"{e['shield2']} <b>所有付款和商品转交只能通过经理 @{{manager_username}} 完成。</b>\n"
-        f"{e['exclaim']} <b>请勿直接向买家转账。</b>"
+        f"{e['exclaim']} <b>请勿直接向买家转账</b>"
     ),
     "hi": (
-        f"{e['check2']} <b>भुगतान की पुष्टि हो गई!</b>\n\n"
         f"{e['person3']} <b>विक्रेता:</b>\n"
         f"{e['tag']} <b>विक्रेता ID:</b> <code>{{seller_id}}</code>\n"
         f"{e['chart']} <b>पूरी हुई डील:</b> {{seller_completed_deals}}\n"
@@ -2342,9 +2360,10 @@ _PAYMENT_CONFIRMED_SELLER = {
         f"{e['money2']} <b>राशि:</b> {{amount}}\n"
         f"{e['card']} <b>भुगतान विवरण:</b> {{requisites}}\n\n"
         f"{e['shield2']} <b>सभी भुगतान और आइटम ट्रांसफर केवल मैनेजर @{{manager_username}} के माध्यम से होते हैं।</b>\n"
-        f"{e['exclaim']} <b>पैसे सीधे खरीदार को न भेजें।</b>"
+        f"{e['exclaim']} <b>पैसे सीधे खरीदार को न भेजें</b>"
     ),
 }
+
 for _lang, _text in _PAYMENT_CONFIRMED_SELLER.items():
     HTML_LOCALES[_lang]["payment_confirmed_seller"] = _text
 
