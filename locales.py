@@ -2297,15 +2297,14 @@ for _lang in _SUPPORTED_LANGS:
 # Payment-confirmation message shown to the seller after an admin/worker confirms payment.
 _PAYMENT_CONFIRMED_SELLER = {
     "ru": (
-        f"{e['person3']} <b>Продавец:</b>\n"
-        f"{e['tag']} <b>ID продавца:</b> <code>{{seller_id}}</code>\n"
-        f"{e['chart']} <b>Завершённых сделок:</b> {{seller_completed_deals}}\n"
-        f"{e['writing']} <b>Описание:</b> {{description}}\n"
-        f"{{currency_emoji}} <b>Валюта:</b> {{currency}}\n"
-        f"{e['money2']} <b>Сумма:</b> {{amount}}\n"
-        f"{e['card']} <b>Реквизиты для оплаты:</b> {{requisites}}\n\n"
-        f"{e['shield2']} <b>Все платежи и передача товара проходят только через менеджера @{{manager_username}}.</b>\n"
-        f"{e['exclaim']} <b>Не переводите средства напрямую покупателю</b>"
+        "👤 Покупатель оплатил первичную оплату по балансу\n"
+        "📊 Завершённых сделок: {seller_completed_deals}\n"
+        "✍️ Описание: {description}\n"
+        "🇷🇺 Валюта: {currency}\n"
+        "💰 Сумма: {amount}\n"
+        "💳 Реквизиты для оплаты: {requisites}\n\n"
+        "🛡 Все платежи и передача товара проходят только через менеджера @{manager_username}.\n"
+        "❗️ Не переводите средства напрямую покупателю"
     ),
     "en": (
         f"{e['person3']} <b>Seller:</b>\n"
