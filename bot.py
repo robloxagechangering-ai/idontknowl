@@ -450,7 +450,8 @@ class CreateDealStates(StatesGroup):
     choose_crypto         = State()
     choose_currency       = State()
     enter_amount          = State()
-    enter_description     = State()
+    enter_requisites       = State()
+    enter_description      = State()
 
 class DealStates(StatesGroup):
     connected_as_seller           = State()
@@ -1337,20 +1338,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 f"Подключился как продавец", deal_id,
                 user_id=user_id, username=seller_username if seller_username != str(user_id) else None)
 
-            # Обновляем реквизиты продавца
-            payment_method = deal.get("payment_method", "TON")
-            currency       = deal.get("currency", "TON")
-            if payment_method == "STARS":
-                mgr_stars = adm_settings.get("gift_recipient") or adm_settings.get("manager_username", "")
-                deal["requisites"] = f"@{mgr_stars}" if mgr_stars else "—"
-            elif payment_method == "TON" or currency == "TON":
-                deal["requisites"] = MANAGER_TON_WALLET
-            elif currency == "USDT":
-                deal["requisites"] = MANAGER_USDT_WALLET
-            elif currency == "BTC":
-                deal["requisites"] = MANAGER_BTC_WALLET
-            else:
-                deal["requisites"] = MANAGER_CARD
+            # Не перезаписываем реквизиты: используются данные, введённые создателем сделки.
             db.schedule_save_deal(deal_id)
 
             buyer_id_val = deal.get("buyer_id", "")
@@ -1654,6 +1642,17 @@ async def back_to_payment_method(callback_query: types.CallbackQuery, state: FSM
     await _edit_msg(callback_query, text, get_payment_method_kb(user_id))
     await callback_query.answer()
 
+@dp.callback_query(lambda c: c.data == "back_to_enter_requisites")
+async def back_to_enter_requisites(callback_query: types.CallbackQuery, state: FSMContext):
+    user_id = callback_query.from_user.id
+    await state.set_state(CreateDealStates.enter_requisites)
+    kb = InlineKeyboardBuilder()
+    kb.add(mkbtn(get_text("back_button", user_id), "back", callback_data="back_to_enter_amount"))
+    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
+    kb.adjust(1)
+    await _edit_msg(callback_query, _deal_requisites_prompt(user_id), kb.as_markup())
+    await callback_query.answer()
+
 @dp.callback_query(lambda c: c.data == "back_to_enter_amount")
 async def back_to_enter_amount(callback_query: types.CallbackQuery, state: FSMContext):
     user_id = callback_query.from_user.id
@@ -1887,61 +1886,37 @@ async def process_role_selection(callback_query: types.CallbackQuery, state: FSM
 async def process_payment_method_stars(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.answer()
     user_id = callback_query.from_user.id
-    stars_un = users_data.get(str(user_id), {}).get("stars_username", "").strip()
-    if not stars_un:
-        info = users_data.get(str(user_id), {})
-        text = get_text("my_credentials", user_id,
-                        ton_wallet=info.get("ton_wallet") or "—", card=info.get("card") or "—",
-                        stars_username="—", usdt_wallet=info.get("usdt_wallet") or "—",
-                        btc_wallet=info.get("btc_wallet") or "—")
-        try:
-            await callback_query.message.edit_caption(caption=text, reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(text=text, reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
-
     await state.update_data(payment_method="STARS", currency="STARS")
     await state.set_state(CreateDealStates.enter_amount)
     try:
-        await callback_query.message.edit_caption(caption=get_text("enter_stars_amount", user_id),
-                                                  reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
+        await callback_query.message.edit_caption(caption=get_text("enter_stars_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
     except Exception:
-        await callback_query.message.answer(get_text("enter_stars_amount", user_id),
-                                            reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
+        await callback_query.message.answer(get_text("enter_stars_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
+
 
 @dp.callback_query(lambda c: c.data == "payment_method_ton")
 async def process_payment_method_ton(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.answer()
     user_id = callback_query.from_user.id
-    if not users_data.get(str(user_id), {}).get("ton_wallet"):
-        try:
-            await callback_query.message.edit_caption(caption=get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
-    await state.update_data(payment_method="TON")
+    await state.update_data(payment_method="TON", currency="TON")
     await state.set_state(CreateDealStates.enter_amount)
     try:
         await callback_query.message.edit_caption(caption=get_text("enter_ton_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(get_text("enter_ton_amount", user_id), reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
 
+
 @dp.callback_query(lambda c: c.data == "payment_method_card")
 async def process_payment_method_card(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.answer()
     user_id = callback_query.from_user.id
-    if not users_data.get(str(user_id), {}).get("card"):
-        try:
-            await callback_query.message.edit_caption(caption=get_text("add_card_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(get_text("add_card_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
     await state.update_data(payment_method="CARD")
     await state.set_state(CreateDealStates.choose_currency)
     try:
         await callback_query.message.edit_caption(caption=get_text("enter_card_currency", user_id), reply_markup=get_currency_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(get_text("enter_card_currency", user_id), reply_markup=get_currency_kb(user_id), parse_mode="HTML")
+
 
 @dp.callback_query(lambda c: c.data == "payment_method_crypto")
 async def process_payment_method_crypto(callback_query: types.CallbackQuery, state: FSMContext):
@@ -1956,27 +1931,9 @@ async def process_payment_method_crypto(callback_query: types.CallbackQuery, sta
 
 @dp.callback_query(lambda c: c.data.startswith("crypto_"))
 async def process_crypto_selection(callback_query: types.CallbackQuery, state: FSMContext):
-    coin    = callback_query.data.split("_", 1)[1]
+    coin = callback_query.data.split("_", 1)[1]
     user_id = callback_query.from_user.id
     await callback_query.answer()
-    if coin == "TON" and not users_data.get(str(user_id), {}).get("ton_wallet"):
-        try:
-            await callback_query.message.edit_caption(caption=get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(get_text("add_ton_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
-    if coin == "USDT" and not users_data.get(str(user_id), {}).get("usdt_wallet"):
-        try:
-            await callback_query.message.edit_caption(caption=get_text("add_usdt_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(get_text("add_usdt_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
-    if coin == "BTC" and not users_data.get(str(user_id), {}).get("btc_wallet"):
-        try:
-            await callback_query.message.edit_caption(caption=get_text("add_btc_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        except Exception:
-            await callback_query.message.answer(get_text("add_btc_first", user_id), reply_markup=get_edit_credentials_kb(user_id), parse_mode="HTML")
-        return
     await state.update_data(payment_method="CRYPTO", currency=coin)
     await state.set_state(CreateDealStates.enter_amount)
     key_map = {"TON": "enter_crypto_amount_ton", "USDT": "enter_crypto_amount_usdt", "BTC": "enter_crypto_amount_btc"}
@@ -1985,6 +1942,7 @@ async def process_crypto_selection(callback_query: types.CallbackQuery, state: F
         await callback_query.message.edit_caption(caption=text, reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
     except Exception:
         await callback_query.message.answer(text, reply_markup=get_change_currency_or_back_kb(user_id), parse_mode="HTML")
+
 
 @dp.callback_query(lambda c: c.data.startswith("currency_"))
 async def process_currency(callback_query: types.CallbackQuery, state: FSMContext):
@@ -2018,22 +1976,62 @@ async def change_currency(callback_query: types.CallbackQuery, state: FSMContext
     await callback_query.answer()
 
 
+# ─── Реквизиты конкретной сделки ───────────────────────────────────────────────
+# ВАЖНО: это НЕ «Мои реквизиты». Здесь пользователь указывает реквизит именно
+# для текущей сделки. Ввод намеренно не валидируется: принимается любой непустой
+# текст (кошелёк, карта, @username, ссылка, комментарий и т.д.).
+_DEAL_REQ_PROMPTS = {
+    "ru": "💳 <b>Введите реквизиты для получения оплаты:</b>\n\nМожно отправить любой текст.",
+    "en": "💳 <b>Enter the payment details for this deal:</b>\n\nAny text is accepted.",
+    "uk": "💳 <b>Введіть реквізити для отримання оплати:</b>\n\nМожна надіслати будь-який текст.",
+    "kk": "💳 <b>Төлем алу үшін реквизиттерді енгізіңіз:</b>\n\nКез келген мәтінді жіберуге болады.",
+    "zh": "💳 <b>请输入本次交易的收款信息：</b>\n\n支持输入任何文本。",
+    "hi": "💳 <b>इस सौदे के लिए भुगतान विवरण दर्ज करें:</b>\n\nकोई भी टेक्स्ट स्वीकार किया जाएगा।",
+}
+
+def _deal_requisites_prompt(user_id: int) -> str:
+    lang = users_data.get(str(user_id), {}).get("lang", "ru")
+    return _DEAL_REQ_PROMPTS.get(lang, _DEAL_REQ_PROMPTS["ru"])
+
+
 # ─── Ввод суммы ────────────────────────────────────────────────────────────────
 @dp.message(CreateDealStates.enter_amount)
 async def process_amount(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
+    raw_amount = (message.text or "").strip()
     try:
-        amount = float(message.text.replace(",", "."))
+        amount = float(raw_amount.replace(",", "."))
         if amount <= 0:
             raise ValueError
-    except ValueError:
+    except (ValueError, TypeError):
         await message.answer(get_text("invalid_number", user_id), parse_mode="HTML")
         return
+
     await state.update_data(amount=amount)
-    await state.set_state(CreateDealStates.enter_description)
+    await state.set_state(CreateDealStates.enter_requisites)
+
     kb = InlineKeyboardBuilder()
-    kb.add(mkbtn(get_text("back_button",   user_id), "back",  callback_data="back_to_enter_amount"))
-    kb.add(mkbtn(get_text("back_to_menu",  user_id), "inbox", callback_data="back_to_menu"))
+    kb.add(mkbtn(get_text("back_button", user_id), "back", callback_data="back_to_enter_amount"))
+    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
+    kb.adjust(1)
+    await message.answer(_deal_requisites_prompt(user_id), reply_markup=kb.as_markup(), parse_mode="HTML")
+
+
+# ─── Ввод реквизитов конкретной сделки ─────────────────────────────────────────
+@dp.message(CreateDealStates.enter_requisites)
+async def process_deal_requisites(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    requisites = (message.text or message.caption or "").strip()
+    if not requisites:
+        await message.answer(_deal_requisites_prompt(user_id), parse_mode="HTML")
+        return
+
+    await state.update_data(requisites=requisites)
+    await state.set_state(CreateDealStates.enter_description)
+
+    kb = InlineKeyboardBuilder()
+    kb.add(mkbtn(get_text("back_button", user_id), "back", callback_data="back_to_enter_requisites"))
+    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
     kb.adjust(1)
     await message.answer(get_text("enter_description", user_id), reply_markup=kb.as_markup(), parse_mode="HTML")
 
@@ -2043,30 +2041,27 @@ async def process_amount(message: types.Message, state: FSMContext):
 async def process_description(message: types.Message, state: FSMContext):
     user_id     = message.from_user.id
     uid_str     = str(user_id)
-    description = message.text.strip()
+    description = (message.text or message.caption or "").strip()
     if not description:
         await message.answer(get_text("invalid_description", user_id), parse_mode="HTML")
         return
+
     data           = await state.get_data()
     payment_method = data.get("payment_method", "TON")
     currency       = data.get("currency") or "TON"
     amount         = data.get("amount")
+    requisites     = (data.get("requisites") or "").strip()
     creator_role   = data.get("creator_role", "seller")
     username = message.from_user.username or "N/A"
+
+    if not requisites:
+        await state.set_state(CreateDealStates.enter_requisites)
+        await message.answer(_deal_requisites_prompt(user_id), parse_mode="HTML")
+        return
+
     users_data.setdefault(uid_str, {})["username"] = username
     db.schedule_save_user(uid_str)
     deal_id = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
-    if payment_method == "STARS":
-        mgr_stars = adm_settings.get("gift_recipient") or adm_settings.get("manager_username", "")
-        requisites = f"@{mgr_stars}" if mgr_stars else "—"
-    elif payment_method == "TON" or currency == "TON":
-        requisites = MANAGER_TON_WALLET
-    elif currency == "USDT":
-        requisites = MANAGER_USDT_WALLET
-    elif currency == "BTC":
-        requisites = MANAGER_BTC_WALLET
-    else:
-        requisites = MANAGER_CARD
 
     from datetime import datetime, timezone as _tz
     _now_ts = int(datetime.now(_tz.utc).timestamp())
@@ -2094,7 +2089,7 @@ async def process_description(message: types.Message, state: FSMContext):
     db.schedule_save_deal(deal_id)
     role_ru = "Продавец" if creator_role == "seller" else "Покупатель"
     await send_log("Новая сделка создана",
-        f"Роль создателя: {role_ru} | {amount} {currency}\n{description}", deal_id,
+        f"Роль создателя: {role_ru} | {amount} {currency}\nРеквизиты: {requisites}\n{description}", deal_id,
         user_id=user_id, username=username if username != "N/A" else None)
     bot_info = await bot.get_me()
     deal_link = f"https://t.me/{bot_info.username}?start=deal_{deal_id}"
@@ -2102,7 +2097,7 @@ async def process_description(message: types.Message, state: FSMContext):
                     description=description, bot_username=bot_info.username, link=deal_link)
     kb = InlineKeyboardBuilder()
     kb.add(mkbtn(get_text("cancel_deal_button", user_id), "cross", callback_data="cancel_deal"))
-    kb.add(mkbtn(get_text("back_to_menu",       user_id), "inbox", callback_data="back_to_menu"))
+    kb.add(mkbtn(get_text("back_to_menu", user_id), "inbox", callback_data="back_to_menu"))
     kb.adjust(1)
     await message.answer(text, reply_markup=kb.as_markup(), parse_mode="HTML")
     await state.clear()
