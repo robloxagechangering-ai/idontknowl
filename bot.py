@@ -696,13 +696,13 @@ def get_payment_method_kb(user_id: int):
             return fallback
         return value.strip()
 
-    kb.add(mkbtn(_label("payment_method_ton", "TON"), "diamond", callback_data="payment_method_ton"))
+    # TON выбирается внутри «Крипта», отдельной кнопки TON здесь нет.
     kb.add(mkbtn(_label("payment_method_card", "Карта"), "card", callback_data="payment_method_card"))
     kb.add(mkbtn(_label("payment_method_stars", "Stars"), "star", callback_data="payment_method_stars"))
     kb.add(mkbtn(_label("payment_method_crypto", "Крипта"), "coin", callback_data="payment_method_crypto"))
     kb.add(mkbtn(_label("back_button", "Назад"), "back", callback_data="back_to_role"))
     kb.add(mkbtn(_label("back_to_menu", "Назад в меню"), "inbox", callback_data="back_to_menu"))
-    kb.adjust(2, 2, 1, 1)
+    kb.adjust(2, 1, 1, 1)
     return kb.as_markup()
 
 def get_crypto_kb(user_id: int):
@@ -1818,11 +1818,15 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
     elif action == "referral":
         info = users_data.get(str(user_id), {})
         ref_link = info.get("ref_link", "")
+        referrals_count = len(info.get("referrals", []))
+        # Передаём оба набора имён для совместимости со старыми локалями.
         text = get_text(
             "referral", user_id,
             ref_link=ref_link,
-            referrals_count=len(info.get("referrals", [])),
+            referrals_count=referrals_count,
             earnings=info.get("referral_earnings", 0.0),
+            link=ref_link,
+            total=referrals_count,
         )
         kb = InlineKeyboardBuilder()
         kb.row(mkbtn(get_text("copy_ref_link_button", user_id), copy_text=types.CopyTextButton(text=ref_link)))
