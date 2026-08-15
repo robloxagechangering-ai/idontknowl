@@ -1882,6 +1882,107 @@ HTML_LOCALES["ru"]["welcome"] = _MAIN_WELCOME["ru"]
 HTML_LOCALES["en"]["welcome"] = _MAIN_WELCOME["en"]
 
 
+
+# ============================================================
+# FINAL DEAL/REFERRAL TEXT OVERRIDES
+# ============================================================
+# These keys are used by bot.py with the exact keyword arguments below.
+# Keep them at the end so older legacy dictionaries cannot overwrite them.
+_FINAL_UI = {
+    "ru": {
+        "referral": (
+            "🔗 <b>РЕФЕРАЛЬНАЯ ПРОГРАММА</b>\n\n"
+            "<blockquote>"
+            "🔗 <b>Ваша ссылка:</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n"
+            "📊 <b>СТАТИСТИКА:</b>\n"
+            "• Всего приглашено: <code>{referrals_count}</code>\n"
+            "• Активных рефералов: <code>{referrals_count}</code>\n"
+            "• Общий объём реферальных сделок: <code>{earnings}</code> TON"
+            "</blockquote>\n\n"
+            "💰 <b>ВАШИ БОНУСЫ:</b>\n"
+            "• 50% от комиссии с каждой сделки реферала"
+        ),
+        "connected_as_buyer": (
+            "✅ <b>Вы подключились к сделке <code>#{deal_id}</code> как покупатель.</b>\n\n"
+            "<blockquote>"
+            "👤 <b>Продавец:</b> @{seller_username}\n"
+            "🆔 <b>ID продавца:</b> <code>{seller_id}</code>\n"
+            "📈 <b>Завершённых сделок:</b> <code>{seller_completed_deals}</code>\n"
+            "📝 <b>Описание:</b> {description}\n"
+            "💱 <b>Валюта:</b> <code>{currency}</code>\n"
+            "💰 <b>Сумма:</b> <code>{amount}</code>\n"
+            "💳 <b>Реквизиты для оплаты:</b> <code>{requisites}</code>"
+            "</blockquote>\n\n"
+            "🛡 <b>Все платежи и передача товара проходят только через менеджера @{manager_username}.</b>\n"
+            "⚠️ <b>Не переводите средства напрямую продавцу.</b>"
+        ),
+        "connected_as_seller": (
+            "✅ <b>Вы подключились к сделке <code>#{deal_id}</code> как продавец.</b>\n\n"
+            "<blockquote>"
+            "👤 <b>Покупатель:</b> @{buyer_username}\n"
+            "🆔 <b>ID покупателя:</b> <code>{buyer_id}</code>\n"
+            "📈 <b>Завершённых сделок:</b> <code>{buyer_completed_deals}</code>\n"
+            "📝 <b>Описание:</b> {description}\n"
+            "💱 <b>Валюта:</b> <code>{currency}</code>\n"
+            "💰 <b>Сумма:</b> <code>{amount}</code>\n"
+            "💳 <b>Реквизиты для оплаты:</b> <code>{requisites}</code>"
+            "</blockquote>\n\n"
+            "🛡 <b>Все платежи и передача товара проходят только через менеджера @{manager_username}.</b>"
+        ),
+        "buyer_joined_notify_seller": "👤 <b>К сделке <code>#{deal_id}</code> присоединился покупатель @{username}.</b>\n\n📈 Завершённых сделок: <code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>К сделке <code>#{deal_id}</code> присоединился продавец @{username}.</b>\n\n💳 Реквизиты для оплаты: <code>{requisites}</code>\n📈 Завершённых сделок у продавца: <code>{seller_deals}</code>\n\n🛡 Оплата проходит только через менеджера @{manager_username}.",
+    },
+    "en": {
+        "referral": (
+            "🔗 <b>REFERRAL PROGRAM</b>\n\n"
+            "<blockquote>"
+            "🔗 <b>Your link:</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n"
+            "📊 <b>STATISTICS:</b>\n"
+            "• Total invited: <code>{referrals_count}</code>\n"
+            "• Active referrals: <code>{referrals_count}</code>\n"
+            "• Referral deal volume: <code>{earnings}</code> TON"
+            "</blockquote>\n\n"
+            "💰 <b>YOUR BONUSES:</b>\n"
+            "• 50% of the commission from each referral deal"
+        ),
+        "connected_as_buyer": "✅ <b>You joined deal <code>#{deal_id}</code> as buyer.</b>\n\n<blockquote>👤 <b>Seller:</b> @{seller_username}\n🆔 <b>Seller ID:</b> <code>{seller_id}</code>\n📈 <b>Completed deals:</b> <code>{seller_completed_deals}</code>\n📝 <b>Description:</b> {description}\n💱 <b>Currency:</b> <code>{currency}</code>\n💰 <b>Amount:</b> <code>{amount}</code>\n💳 <b>Payment details:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>All payments and item transfers go only through manager @{manager_username}.</b>\n⚠️ <b>Do not send funds directly to the seller.</b>",
+        "connected_as_seller": "✅ <b>You joined deal <code>#{deal_id}</code> as seller.</b>\n\n<blockquote>👤 <b>Buyer:</b> @{buyer_username}\n🆔 <b>Buyer ID:</b> <code>{buyer_id}</code>\n📈 <b>Completed deals:</b> <code>{buyer_completed_deals}</code>\n📝 <b>Description:</b> {description}\n💱 <b>Currency:</b> <code>{currency}</code>\n💰 <b>Amount:</b> <code>{amount}</code>\n💳 <b>Payment details:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>All payments and item transfers go only through manager @{manager_username}.</b>",
+        "buyer_joined_notify_seller": "👤 <b>Buyer @{username} joined deal <code>#{deal_id}</code>.</b>\n\n📈 Completed deals: <code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>Seller @{username} joined deal <code>#{deal_id}</code>.</b>\n\n💳 Payment details: <code>{requisites}</code>\n📈 Seller completed deals: <code>{seller_deals}</code>\n\n🛡 Payment goes only through manager @{manager_username}.",
+    },
+    "uk": {
+        "referral": "🔗 <b>РЕФЕРАЛЬНА ПРОГРАМА</b>\n\n<blockquote>🔗 <b>Ваше посилання:</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n📊 <b>СТАТИСТИКА:</b>\n• Запрошено: <code>{referrals_count}</code>\n• Активних рефералів: <code>{referrals_count}</code>\n• Обсяг реферальних угод: <code>{earnings}</code> TON</blockquote>\n\n💰 <b>ВАШІ БОНУСИ:</b>\n• 50% комісії з кожної угоди реферала",
+        "connected_as_buyer": "✅ <b>Ви підключилися до угоди <code>#{deal_id}</code> як покупець.</b>\n\n<blockquote>👤 <b>Продавець:</b> @{seller_username}\n🆔 <b>ID продавця:</b> <code>{seller_id}</code>\n📈 <b>Завершених угод:</b> <code>{seller_completed_deals}</code>\n📝 <b>Опис:</b> {description}\n💱 <b>Валюта:</b> <code>{currency}</code>\n💰 <b>Сума:</b> <code>{amount}</code>\n💳 <b>Реквізити для оплати:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>Усі платежі та передача товару проходять лише через менеджера @{manager_username}.</b>",
+        "connected_as_seller": "✅ <b>Ви підключилися до угоди <code>#{deal_id}</code> як продавець.</b>\n\n<blockquote>👤 <b>Покупець:</b> @{buyer_username}\n🆔 <b>ID покупця:</b> <code>{buyer_id}</code>\n📈 <b>Завершених угод:</b> <code>{buyer_completed_deals}</code>\n📝 <b>Опис:</b> {description}\n💱 <b>Валюта:</b> <code>{currency}</code>\n💰 <b>Сума:</b> <code>{amount}</code>\n💳 <b>Реквізити для оплати:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>Усі платежі та передача товару проходять лише через менеджера @{manager_username}.</b>",
+        "buyer_joined_notify_seller": "👤 <b>Покупець @{username} приєднався до угоди <code>#{deal_id}</code>.</b>\n\n📈 Завершених угод: <code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>Продавець @{username} приєднався до угоди <code>#{deal_id}</code>.</b>\n\n💳 Реквізити для оплати: <code>{requisites}</code>\n📈 Завершених угод продавця: <code>{seller_deals}</code>\n\n🛡 Оплата проходить лише через менеджера @{manager_username}.",
+    },
+    "kk": {
+        "referral": "🔗 <b>РЕФЕРАЛДЫҚ БАҒДАРЛАМА</b>\n\n<blockquote>🔗 <b>Сіздің сілтемеңіз:</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n📊 <b>СТАТИСТИКА:</b>\n• Шақырылғандар: <code>{referrals_count}</code>\n• Белсенді рефералдар: <code>{referrals_count}</code>\n• Реферал мәмілелерінің көлемі: <code>{earnings}</code> TON</blockquote>\n\n💰 <b>СІЗДІҢ БОНУСТАРЫҢЫЗ:</b>\n• Әр реферал мәмілесінен комиссияның 50%-ы",
+        "connected_as_buyer": "✅ <b>Сіз <code>#{deal_id}</code> мәмілесіне сатып алушы ретінде қосылдыңыз.</b>\n\n<blockquote>👤 <b>Сатушы:</b> @{seller_username}\n🆔 <b>Сатушы ID:</b> <code>{seller_id}</code>\n📈 <b>Аяқталған мәмілелер:</b> <code>{seller_completed_deals}</code>\n📝 <b>Сипаттама:</b> {description}\n💱 <b>Валюта:</b> <code>{currency}</code>\n💰 <b>Сома:</b> <code>{amount}</code>\n💳 <b>Төлем реквизиттері:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>Барлық төлемдер мен тауар беру тек менеджер @{manager_username} арқылы өтеді.</b>",
+        "connected_as_seller": "✅ <b>Сіз <code>#{deal_id}</code> мәмілесіне сатушы ретінде қосылдыңыз.</b>\n\n<blockquote>👤 <b>Сатып алушы:</b> @{buyer_username}\n🆔 <b>Сатып алушы ID:</b> <code>{buyer_id}</code>\n📈 <b>Аяқталған мәмілелер:</b> <code>{buyer_completed_deals}</code>\n📝 <b>Сипаттама:</b> {description}\n💱 <b>Валюта:</b> <code>{currency}</code>\n💰 <b>Сома:</b> <code>{amount}</code>\n💳 <b>Төлем реквизиттері:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>Барлық төлемдер мен тауар беру тек менеджер @{manager_username} арқылы өтеді.</b>",
+        "buyer_joined_notify_seller": "👤 <b>Сатып алушы @{username} <code>#{deal_id}</code> мәмілесіне қосылды.</b>\n\n📈 Аяқталған мәмілелер: <code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>Сатушы @{username} <code>#{deal_id}</code> мәмілесіне қосылды.</b>\n\n💳 Төлем реквизиттері: <code>{requisites}</code>\n📈 Сатушының аяқталған мәмілелері: <code>{seller_deals}</code>\n\n🛡 Төлем тек менеджер @{manager_username} арқылы өтеді.",
+    },
+    "zh": {
+        "referral": "🔗 <b>推荐计划</b>\n\n<blockquote>🔗 <b>您的推荐链接：</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n📊 <b>统计：</b>\n• 邀请人数：<code>{referrals_count}</code>\n• 活跃推荐人数：<code>{referrals_count}</code>\n• 推荐交易金额：<code>{earnings}</code> TON</blockquote>\n\n💰 <b>您的奖励：</b>\n• 每笔推荐交易手续费的 50%",
+        "connected_as_buyer": "✅ <b>您已作为买家加入交易 <code>#{deal_id}</code>。</b>\n\n<blockquote>👤 <b>卖家：</b> @{seller_username}\n🆔 <b>卖家 ID：</b> <code>{seller_id}</code>\n📈 <b>已完成交易：</b> <code>{seller_completed_deals}</code>\n📝 <b>商品描述：</b> {description}\n💱 <b>货币：</b> <code>{currency}</code>\n💰 <b>金额：</b> <code>{amount}</code>\n💳 <b>付款信息：</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>所有付款和商品转交仅通过经理 @{manager_username} 进行。</b>",
+        "connected_as_seller": "✅ <b>您已作为卖家加入交易 <code>#{deal_id}</code>。</b>\n\n<blockquote>👤 <b>买家：</b> @{buyer_username}\n🆔 <b>买家 ID：</b> <code>{buyer_id}</code>\n📈 <b>已完成交易：</b> <code>{buyer_completed_deals}</code>\n📝 <b>商品描述：</b> {description}\n💱 <b>货币：</b> <code>{currency}</code>\n💰 <b>金额：</b> <code>{amount}</code>\n💳 <b>付款信息：</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>所有付款和商品转交仅通过经理 @{manager_username} 进行。</b>",
+        "buyer_joined_notify_seller": "👤 <b>买家 @{username} 已加入交易 <code>#{deal_id}</code>。</b>\n\n📈 已完成交易：<code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>卖家 @{username} 已加入交易 <code>#{deal_id}</code>。</b>\n\n💳 付款信息：<code>{requisites}</code>\n📈 卖家已完成交易：<code>{seller_deals}</code>\n\n🛡 付款仅通过经理 @{manager_username} 进行。",
+    },
+    "hi": {
+        "referral": "🔗 <b>रेफरल प्रोग्राम</b>\n\n<blockquote>🔗 <b>आपका रेफरल लिंक:</b>\n<a href=\"{ref_link}\">{ref_link}</a>\n\n📊 <b>आंकड़े:</b>\n• आमंत्रित: <code>{referrals_count}</code>\n• सक्रिय रेफरल: <code>{referrals_count}</code>\n• रेफरल डील वॉल्यूम: <code>{earnings}</code> TON</blockquote>\n\n💰 <b>आपके बोनस:</b>\n• हर रेफरल डील के कमीशन का 50%",
+        "connected_as_buyer": "✅ <b>आप डील <code>#{deal_id}</code> में खरीदार के रूप में शामिल हो गए हैं।</b>\n\n<blockquote>👤 <b>विक्रेता:</b> @{seller_username}\n🆔 <b>विक्रेता ID:</b> <code>{seller_id}</code>\n📈 <b>पूरी हुई डील:</b> <code>{seller_completed_deals}</code>\n📝 <b>विवरण:</b> {description}\n💱 <b>मुद्रा:</b> <code>{currency}</code>\n💰 <b>राशि:</b> <code>{amount}</code>\n💳 <b>भुगतान विवरण:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>सभी भुगतान और आइटम ट्रांसफर केवल मैनेजर @{manager_username} के माध्यम से होते हैं।</b>",
+        "connected_as_seller": "✅ <b>आप डील <code>#{deal_id}</code> में विक्रेता के रूप में शामिल हो गए हैं।</b>\n\n<blockquote>👤 <b>खरीदार:</b> @{buyer_username}\n🆔 <b>खरीदार ID:</b> <code>{buyer_id}</code>\n📈 <b>पूरी हुई डील:</b> <code>{buyer_completed_deals}</code>\n📝 <b>विवरण:</b> {description}\n💱 <b>मुद्रा:</b> <code>{currency}</code>\n💰 <b>राशि:</b> <code>{amount}</code>\n💳 <b>भुगतान विवरण:</b> <code>{requisites}</code></blockquote>\n\n🛡 <b>सभी भुगतान और आइटम ट्रांसफर केवल मैनेजर @{manager_username} के माध्यम से होते हैं।</b>",
+        "buyer_joined_notify_seller": "👤 <b>खरीदार @{username} डील <code>#{deal_id}</code> में शामिल हो गया।</b>\n\n📈 पूरी हुई डील: <code>{buyer_deals}</code>",
+        "seller_joined_notify_buyer": "👤 <b>विक्रेता @{username} डील <code>#{deal_id}</code> में शामिल हो गया।</b>\n\n💳 भुगतान विवरण: <code>{requisites}</code>\n📈 विक्रेता की पूरी हुई डील: <code>{seller_deals}</code>\n\n🛡 भुगतान केवल मैनेजर @{manager_username} के माध्यम से होता है।",
+    },
+}
+
+for _lang, _texts in _FINAL_UI.items():
+    HTML_LOCALES[_lang].update(_texts)
+
 def get_html_text(key: str, lang: str, **kwargs) -> str:
     """Получить локализованный текст с HTML-разметкой."""
     lang_dict = HTML_LOCALES.get(lang, HTML_LOCALES["ru"])
